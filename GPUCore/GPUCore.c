@@ -1,12 +1,8 @@
 #include "GPUCore.h"
 
-//-----  Macros de seleccion de modo -----//
-#define GPU_TFT_SELECT GPU_PIN_TFT_CS=0               //Activa CS del TFT
-#define GPU_TFT_DESELECT GPU_PIN_TFT_CS=1             //Desactiva CS del TFT
-#define GPU_TFT_CMD GPU_PIN_TFT_DC=0                  //Indica al TFT que se le pasa comando
-#define GPU_TFT_DATA GPU_PIN_TFT_DC=1                 //Indoca al TFT que se le pasa datos
-
-//----- Macros de configuracion del TFT -----// 
+//==============================================================================
+//======================= Macros configuracion TFT =============================
+//==============================================================================
 
 //--- Encendido y apagado ---//
 #define GPU_TFT_OFF 0x0028    //Apaga la pantalla
@@ -60,17 +56,17 @@ uint32_t GPU_SPI_write(uint32_t data){
 }
 
 void GPU_writeCmd(uint32_t cmd){
-    GPU_TFT_CMD;
-    GPU_TFT_SELECT;
+    SPI_TFT_CMD;
+    SPI_TFT_SELECT;
     GPU_SPI_write(cmd);
-    GPU_TFT_DESELECT;
+    SPI_TFT_DESELECT;
 }
 
 void GPU_writeData(uint32_t data){
-    GPU_TFT_DATA;
-    GPU_TFT_SELECT;
+    SPI_TFT_DATA;
+    SPI_TFT_SELECT;
     GPU_SPI_write(data);
-    GPU_TFT_DESELECT;
+    SPI_TFT_DESELECT;
 }
 
 void GPU_TFT_manufacturerCMD(){
@@ -111,9 +107,9 @@ void GPU_TFT_manufacturerCMD(){
 }
 
 void GPU_TFT_init(){
-    GPU_TFT_CS_ENABLE;
-    GPU_TFT_DC_ENABLE;
-    GPU_TFT_DESELECT;
+    SPI_TFT_CS_ENABLE;
+    SPI_TFT_DC_ENABLE;
+    SPI_TFT_DESELECT;
     SPI1CONbits.MODE32 = 0; 
     
     GPU_writeCmd(GPU_TFT_SLEEP_IN);
@@ -337,8 +333,8 @@ void GPU_black(){
     SPI1CONbits.MODE32 = 0; // Transmision de bloques de 32bits
     GPU_writeCmd(0x002C);
     
-    GPU_TFT_DATA;
-    GPU_TFT_SELECT;
+    SPI_TFT_DATA;
+    SPI_TFT_SELECT;
     
     for(i = 0; i < GPU_HEIGHT; i++){
         for(j = 0; j < GPU_WIDTH; j++){
@@ -348,7 +344,7 @@ void GPU_black(){
     }
     while(SPI1STATbits.SPIBUSY != 0);
     SPI1CONbits.MODE32 = 1; // Transmision de bloques de 32bits
-    GPU_TFT_DESELECT;
+    SPI_TFT_DESELECT;
 }
 
 void GPU_scroll(GPU gpu, int pX, int pY){
@@ -384,8 +380,8 @@ void GPU_draw(GPU gpu){
     SPI1CONbits.MODE32 = 0;
     GPU_writeCmd(GPU_TFT_RAM_WR);
     SPI1CONbits.MODE32 = 1;
-    GPU_TFT_DATA;
-    GPU_TFT_SELECT;
+    SPI_TFT_DATA;
+    SPI_TFT_SELECT;
 
     uint8_t *nextTile = gpu->map.tilesMap + (pY * gpu->map.width + pX);
     uint8_t currentTile = *(nextTile)+1;
@@ -440,7 +436,7 @@ void GPU_draw(GPU gpu){
     }
     SPI1CONbits.ON = 0;
     SPI1CONbits.ON = 1;
-    GPU_TFT_DESELECT;
+    SPI_TFT_DESELECT;
     GPU_spritesRenderClear(&gpu->tableDrawables, &gpu->map);
 }
 

@@ -238,6 +238,7 @@ Discarded input sections
  .reginfo       0x00000000       0x18 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\debug-exception-return.o
  .reginfo       0x00000000       0x18 build/default/production/main.o
  .reginfo       0x00000000       0x18 build/default/production/GPUCore/GPUCore.o
+ .reginfo       0x00000000       0x18 build/default/production/IOCore/IOCore.o
  .reginfo       0x00000000       0x18 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib/./proc/32MX270F256B\default_isr_vectors.o
  .discard       0x00000000       0xb0 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib/./proc/32MX270F256B\default_isr_vectors.o
  .reginfo       0x00000000       0x18 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\pic32_software_reset.o
@@ -320,6 +321,7 @@ LOAD c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4
 LOAD c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\debug-exception-return.o
 LOAD build/default/production/main.o
 LOAD build/default/production/GPUCore/GPUCore.o
+LOAD build/default/production/IOCore/IOCore.o
                 0x00000001                __MPLAB_BUILD = 0x1
                 0x00005000                _min_heap_size = 0x5000
 LOAD c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib/./proc/32MX270F256B\default_isr_vectors.o
@@ -910,6 +912,7 @@ END GROUP
  *(.mdebug.abi32)
  .mdebug.abi32  0xa000000c        0x0 build/default/production/main.o
  .mdebug.abi32  0xa000000c        0x0 build/default/production/GPUCore/GPUCore.o
+ .mdebug.abi32  0xa000000c        0x0 build/default/production/IOCore/IOCore.o
  .mdebug.abi32  0xa000000c        0x0 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-bootstrap-exception-handler.o)
  .mdebug.abi32  0xa000000c        0x0 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-on-reset.o)
  .mdebug.abi32  0xa000000c        0x0 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-on-bootstrap.o)
@@ -962,6 +965,7 @@ END GROUP
  .comment       0x00000000       0x3c build/default/production/main.o
                                  0x3d (size before relaxing)
  .comment       0x00000000       0x3d build/default/production/GPUCore/GPUCore.o
+ .comment       0x00000000       0x3d build/default/production/IOCore/IOCore.o
  .comment       0x0000003c       0x18 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(memset.o)
                                  0x19 (size before relaxing)
  .comment       0x00000000       0x3d c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-bootstrap-exception-handler.o)
@@ -1030,6 +1034,7 @@ END GROUP
  *(.debug_line)
  .debug_line    0x00000000      0x213 build/default/production/main.o
  .debug_line    0x00000213      0x382 build/default/production/GPUCore/GPUCore.o
+ .debug_line    0x00000595        0x0 build/default/production/IOCore/IOCore.o
  .debug_line    0x00000595       0xa9 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-bootstrap-exception-handler.o)
  .debug_line    0x0000063e       0x96 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-on-reset.o)
  .debug_line    0x000006d4       0x9a c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-on-bootstrap.o)
@@ -1050,6 +1055,7 @@ END GROUP
  *(.debug_str)
  .debug_str     0x00000000       0x45 build/default/production/main.o
  .debug_str     0x00000045       0x53 build/default/production/GPUCore/GPUCore.o
+ .debug_str     0x00000098        0x0 build/default/production/IOCore/IOCore.o
  .debug_str     0x00000098        0x0 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-bootstrap-exception-handler.o)
  .debug_str     0x00000098        0x0 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-on-reset.o)
  .debug_str     0x00000098        0x0 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-on-bootstrap.o)
@@ -1093,19 +1099,21 @@ END GROUP
  .gnu.attributes
                 0x00000010       0x10 build/default/production/GPUCore/GPUCore.o
  .gnu.attributes
-                0x00000020       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-bootstrap-exception-handler.o)
+                0x00000020       0x10 build/default/production/IOCore/IOCore.o
  .gnu.attributes
-                0x00000030       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-on-reset.o)
+                0x00000030       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-bootstrap-exception-handler.o)
  .gnu.attributes
-                0x00000040       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-on-bootstrap.o)
+                0x00000040       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-on-reset.o)
  .gnu.attributes
-                0x00000050       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-general-exception-handler.o)
+                0x00000050       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-on-bootstrap.o)
  .gnu.attributes
-                0x00000060       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\liblega-c.a(malloc.o)
+                0x00000060       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(default-general-exception-handler.o)
  .gnu.attributes
-                0x00000070       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\liblega-c.a(errno.o)
+                0x00000070       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\liblega-c.a(malloc.o)
  .gnu.attributes
-                0x00000080       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(sbrk.o)
+                0x00000080       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\liblega-c.a(errno.o)
+ .gnu.attributes
+                0x00000090       0x10 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a(sbrk.o)
 LOAD c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3\libgcc.a
 START GROUP
 LOAD c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\libpic32.a
@@ -1479,6 +1487,12 @@ LOAD data_init
  .data          0x00000000        0x0 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib/./proc/32MX270F256B\default_isr_vectors.o
 
 .bss            0x00000000        0x0
+ .bss           0x00000000        0x0 build/default/production/IOCore/IOCore.o
+
+.data           0x00000000        0x0
+ .data          0x00000000        0x0 build/default/production/IOCore/IOCore.o
+
+.bss            0x00000000        0x0
  .bss           0x00000000        0x0 build/default/production/GPUCore/GPUCore.o
 
 .data           0x00000000        0x0
@@ -1794,6 +1808,9 @@ LOAD data_init
 
 .text           0x00000000        0x0
  .text          0x00000000        0x0 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib/./proc/32MX270F256B\default_isr_vectors.o
+
+.text           0x00000000        0x0
+ .text          0x00000000        0x0 build/default/production/IOCore/IOCore.o
 
 .text           0x00000000        0x0
  .text          0x00000000        0x0 c:/program files (x86)/microchip/xc32/v1.42/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib\debug-exception-return.o
