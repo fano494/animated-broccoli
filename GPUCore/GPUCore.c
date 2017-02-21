@@ -48,61 +48,40 @@
 //========================== Funciones privadas ================================
 //==============================================================================
 
-
-uint32_t GPU_SPI_write(uint32_t data){
-    SPI1BUF = data;
-    while(SPI1STATbits.SPIBUSY != 0);
-    return SPI1BUF;
-}
-
-void GPU_writeCmd(uint32_t cmd){
-    SPI_TFT_CMD;
-    SPI_TFT_SELECT;
-    GPU_SPI_write(cmd);
-    SPI_TFT_DESELECT;
-}
-
-void GPU_writeData(uint32_t data){
-    SPI_TFT_DATA;
-    SPI_TFT_SELECT;
-    GPU_SPI_write(data);
-    SPI_TFT_DESELECT;
-}
-
 void GPU_TFT_manufacturerCMD(){
     // Los siguientes comandos no estan documentados por el fabricante, pero
     // indica que debemos incluirlos en cualquier configuracion inicial
     // para el funcionamiento correcto del TFT
-    GPU_writeCmd(0x00EF);
-    GPU_writeData(0x0380);
-    GPU_writeData(0x0200);
+    SPI_writeCmd(0x00EF);
+    SPI_writeData(0x0380);
+    SPI_writeData(0x0200);
 
-    GPU_writeCmd(0x00CF);  
-    GPU_writeData(0x00C1);
-    GPU_writeData(0X3000); 
+    SPI_writeCmd(0x00CF);  
+    SPI_writeData(0x00C1);
+    SPI_writeData(0X3000); 
 
-    GPU_writeCmd(0x00ED);  
-    GPU_writeData(0x6403);  
-    GPU_writeData(0X1281); 
+    SPI_writeCmd(0x00ED);  
+    SPI_writeData(0x6403);  
+    SPI_writeData(0X1281); 
 
-    GPU_writeCmd(0x00E8);  
-    GPU_writeData(0x8500); 
-    GPU_writeData(0x7800); 
+    SPI_writeCmd(0x00E8);  
+    SPI_writeData(0x8500); 
+    SPI_writeData(0x7800); 
 
-    GPU_writeCmd(0x00CB);  
-    GPU_writeData(0x392C); 
-    GPU_writeData(0x0034); 
-    GPU_writeData(0x0200); 
+    SPI_writeCmd(0x00CB);  
+    SPI_writeData(0x392C); 
+    SPI_writeData(0x0034); 
+    SPI_writeData(0x0200); 
 
-    GPU_writeCmd(0x00F7);  
-    GPU_writeData(0x2000); 
+    SPI_writeCmd(0x00F7);  
+    SPI_writeData(0x2000); 
 
-    GPU_writeCmd(0x00EA);  
-    GPU_writeData(0x0000); 
+    SPI_writeCmd(0x00EA);  
+    SPI_writeData(0x0000); 
     
-    GPU_writeCmd(0x00B6);    // Display Function Control 
-    GPU_writeData(0x0A82); 
-    GPU_writeData(0x2700);
+    SPI_writeCmd(0x00B6);    // Display Function Control 
+    SPI_writeData(0x0A82); 
+    SPI_writeData(0x2700);
     
 }
 
@@ -110,99 +89,66 @@ void GPU_TFT_init(){
     SPI_TFT_CS_ENABLE;
     SPI_TFT_DC_ENABLE;
     SPI_TFT_DESELECT;
-    SPI1CONbits.MODE32 = 0; 
     
-    GPU_writeCmd(GPU_TFT_SLEEP_IN);
+    SPI_writeCmd(GPU_TFT_SLEEP_IN);
      
-    GPU_writeCmd(GPU_TFT_CONF_RESET);
-    GPU_writeCmd(GPU_TFT_NORMAL);
+    SPI_writeCmd(GPU_TFT_CONF_RESET);
+    SPI_writeCmd(GPU_TFT_NORMAL);
     GPU_TFT_manufacturerCMD();       //Configuracion inicial dada por el fabricante
     
-    GPU_writeCmd(GPU_TFT_PWCTR1);    //Power control 
-    GPU_writeData(0x2300);   //VRH[5:0] 
+    SPI_writeCmd(GPU_TFT_PWCTR1);    //Power control 
+    SPI_writeData(0x2300);   //VRH[5:0] 
 
-    GPU_writeCmd(GPU_TFT_PWCTR2);    //Power control 
-    GPU_writeData(0x0000);   //SAP[2:0];BT[3:0] 
+    SPI_writeCmd(GPU_TFT_PWCTR2);    //Power control 
+    SPI_writeData(0x0000);   //SAP[2:0];BT[3:0] 
     
-    GPU_writeCmd(GPU_TFT_PWCTR3);
-    GPU_writeData(0xB200);
+    SPI_writeCmd(GPU_TFT_PWCTR3);
+    SPI_writeData(0xB200);
 
-    GPU_writeCmd(GPU_TFT_VMCTR1);    //VCM control 
-    GPU_writeData(0x3e28); 
+    SPI_writeCmd(GPU_TFT_VMCTR1);    //VCM control 
+    SPI_writeData(0x3e28); 
 
-    GPU_writeCmd(GPU_TFT_VMCTR2);    //VCM control2 
-    GPU_writeData(0x8600);  
+    SPI_writeCmd(GPU_TFT_VMCTR2);    //VCM control2 
+    SPI_writeData(0x8600);  
 
-    GPU_writeCmd(GPU_TFT_MEM_CTRL); 
-    GPU_writeData(GPU_TFT_WR_RGB);
+    SPI_writeCmd(GPU_TFT_MEM_CTRL); 
+    SPI_writeData(GPU_TFT_WR_RGB);
 
-    GPU_writeCmd(GPU_TFT_PIX_SIZE);    
-    GPU_writeData(GPU_TFT_PIX_16); 
+    SPI_writeCmd(GPU_TFT_PIX_SIZE);    
+    SPI_writeData(GPU_TFT_PIX_16); 
 
-    GPU_writeCmd(GPU_TFT_FRMCTR1);    
-    GPU_writeData(0x001f);   
+    SPI_writeCmd(GPU_TFT_FRMCTR1);    
+    SPI_writeData(0x001f);   
     
-    GPU_writeCmd(0x00F6);
-    GPU_writeData(0x0100);
-    GPU_writeData(0x0000);
-    GPU_writeCmd(GPU_TFT_SLEEP_OUT);	
-    GPU_writeCmd(GPU_TFT_ON);
+    SPI_writeCmd(0x00F6);
+    SPI_writeData(0x0100);
+    SPI_writeData(0x0000);
+    SPI_writeCmd(GPU_TFT_SLEEP_OUT);	
+    SPI_writeCmd(GPU_TFT_ON);
     
     
-    GPU_writeCmd(GPU_TFT_COL_SET);
-    GPU_writeData(0x0000);
-    GPU_writeData(GPU_HEIGHT-1);
-    GPU_writeCmd(GPU_TFT_RAW_SET);
-    GPU_writeData(0x0000);
-    GPU_writeData(GPU_WIDTH-1);
-    
-    SPI1CONbits.MODE32 = 1; 
-}
-
-void GPU_SPI_init(){
-    int rData;
-    
-    IEC0bits.T5IE = 0;   // Apagamos el timer5/error, se usan para el control de 
-    IEC0bits.IC5EIE = 0; // interrupciones por lectura, escritura o error
-    SPI1CON = 0;         // Reiniciamos la configuracion de SPI1 y lo apagamos
-    rData = SPI1BUF;     // Vaciamos el buffer de SPI1
-    IFS0bits.IC5IF = 0;  // Limpiamos el flag del timer5
-    IFS0bits.IC5EIF = 0; // Limpiamos el flag del timer5 error
-    IPC5bits.IC5IP = 3;  // Indicamos una prioridad de 3 para el timer 5
-    IPC5bits.IC5IS = 1;  // Indicamos una subprioridad de 1 para el timer 5
-    //---- TENER CUIDADO CON LAS PRIORIDADES, DADO QUE EL SISTEMA PUEDE ESTAR ----//
-    //----------- MANEJANDO MAS DE UNA INTERRUPCION DE FORMA SIMULTANEA ----------//
-    IEC0bits.T5IE = 1;   // Encendemos el timer5 y timer5 error una vez 
-    IEC0bits.IC5EIE = 1; // configurados
-    SPI1BRG = 0x00;      // Elimina cualquier divisor de la frecuencia de reloj SPI1
-    SPI1STATbits.SPIROV = 0; // Limpiamos el flag de overflow de SPI1
-    SDI1_ENABLE;         // Activamos el pin de MISO
-    SDO1_ENABLE;         // Activamos el pin de MOSI
-    SPI1CONbits.ENHBUF = 1; // Activar modo mejorado de buffer, (colas de tx y rx)
-    SPI1CONbits.MODE32 = 1; // Transmision de bloques de 32bits
-    SPI1CONbits.MODE16 = 1; // Transmision de bloques de 16bit, no activa pero si preparada
-    SPI1CONbits.SMP = 1; // Muestrear el dato de entrada despues de enviar el dato de salida
-    SPI1CONbits.CKE = 1; // Se considera pulso el paso de activado a desactivado
-    SPI1CONbits.CKP = 0; // CKP == 0 -> Activo = HIGH | Inactivo = LOW
-    SPI1CONbits.MSTEN = 1; // Modo master
-    SPI1CONbits.ON = 1; // Encendemos el modulo SPI1
-    
+    SPI_writeCmd(GPU_TFT_COL_SET);
+    SPI_writeData(0x0000);
+    SPI_writeData(GPU_HEIGHT-1);
+    SPI_writeCmd(GPU_TFT_RAW_SET);
+    SPI_writeData(0x0000);
+    SPI_writeData(GPU_WIDTH-1);
 }
 
 void GPU_spritesRender(TableDrawables *table, Map *map, Tile tiles){
     uint8_t i;
-    for(i = 0; i < table->length; i++){
+    for(i = 0; i < table->length; i++){ // Recorremos la tabla para renderizar todos los dibujables antes de dibujar la pantalla
         Drawable *curr = &(table->drawables[i]);
-        if(curr->infoDraw.visible){
-            if(curr->infoAnim.timer[curr->infoAnim.view]){
+        if(curr->infoDraw.visible){     // Comprobamos si esta visible(Si es statico lo que hace es evitar cambios)
+            if(curr->infoAnim.timer[curr->infoAnim.view]){ // Combrueba si el timer esta activo (timer > 0)
                 
-                if(table->globalTimer % curr->infoAnim.timer[curr->infoAnim.view] == 0){
-                    uint8_t next = curr->infoAnim.next[curr->infoAnim.view];
-                    curr->tile = &(tiles[curr->infoAnim.tile[next]]);
-                    curr->infoAnim.view = next;
+                if(table->globalTimer % curr->infoAnim.timer[curr->infoAnim.view] == 0){ // Combrueba si es necesario un cambio pasivo
+                    uint8_t next = curr->infoAnim.next[curr->infoAnim.view];  // Obtiene cual es la siguiente baldosa
+                    curr->tile = &(tiles[curr->infoAnim.tile[next]]);  // La busca en memoria y se la pasa al puntero del dibujable
+                    curr->infoAnim.view = next; // Modifica el indice para saber cual se esta viendo ahora
                 }
             }
-            if(curr->infoMove.sprite)
+            if(curr->infoMove.sprite) // En caso de ser un sprite hay que ubicarlo en el mapa
                 map->tilesMap[curr->infoMove.sY * map->width + curr->infoMove.sX] = i;
                 
         }
@@ -212,6 +158,9 @@ void GPU_spritesRender(TableDrawables *table, Map *map, Tile tiles){
 
 void GPU_spritesRenderClear(TableDrawables *table, Map *map){
     uint8_t i;
+    // La finalidad de esta funcion es limpiar de sprites el mapa, de este modo en cada frame 
+    // no perdemos la referencia del fondo en caso de haber mas de un solo dibujable en el mismo
+    // punto.
     for(i = 0; i < table->length; i++){
         Drawable *curr = &(table->drawables[i]);
         if(curr->infoMove.sprite)
@@ -220,7 +169,7 @@ void GPU_spritesRenderClear(TableDrawables *table, Map *map){
 }
 
 void GPU_init(){
-    GPU_SPI_init();
+    SPI_init();
     GPU_TFT_init();
     
     
@@ -238,6 +187,8 @@ void GPU_init(){
 //------------------------------ Constructores ---------------------------------
 
 GPU GPU_new(){
+    // Inicializa un driver para la gpu, reserva la memoria minima para poder usarla
+    // y prepara algunos de las sub clases de las que se compone.
     uint8_t i,j,k;
     
     GPU gpu = (GPU) malloc(sizeof(struct GPU));
@@ -330,20 +281,20 @@ void GPU_loadPalette(GPU gpu, Palette *palettes, uint8_t ini, uint8_t length){
 
 void GPU_black(){
     uint16_t i,j;
-    SPI1CONbits.MODE32 = 0; // Transmision de bloques de 32bits
-    GPU_writeCmd(0x002C);
-    
+
+    SPI_writeCmd(GPU_TFT_RAM_WR);
+    SPI_MODE_32;
     SPI_TFT_DATA;
     SPI_TFT_SELECT;
     
-    for(i = 0; i < GPU_HEIGHT; i++){
+    for(i = 0; i < GPU_HEIGHT/2; i++){
         for(j = 0; j < GPU_WIDTH; j++){
-                SPI1BUF = 0x0000;
+                SPI1BUF = 0x00000000;
                 while(SPI1STATbits.SPITBE == 0);
         } 
     }
     while(SPI1STATbits.SPIBUSY != 0);
-    SPI1CONbits.MODE32 = 1; // Transmision de bloques de 32bits
+
     SPI_TFT_DESELECT;
 }
 
@@ -351,6 +302,7 @@ void GPU_scroll(GPU gpu, int pX, int pY){
     gpu->map.pX += pX;
     gpu->map.pY += pY;
     
+    // Comprueba que no nos salimos de los limites del mapa
     if(gpu->map.pX < 0)
         gpu->map.pX = 0;
     else if(gpu->map.pX > gpu->map.width - GPU_TILES_X)
@@ -369,40 +321,45 @@ void GPU_draw(GPU gpu){
     Pixel pixels1, pixels2, pixels3, pixels4;
     Tile tile, back;
     Palette p;
-    int32_t pX = gpu->map.pX;
-    int32_t pY = gpu->map.pY;
-    
+    int32_t pX = gpu->map.pX; // Cargamos los punteros de scroll en varibles 
+    int32_t pY = gpu->map.pY; // auxiliares para evitar conflictos con un scroll
+                              // mediante interrupcion
     uint16_t kFin = pX + GPU_TILES_X;
     uint16_t iFin = pY + GPU_TILES_Y;
-    uint32_t salt = GPU_TILES_X * GPU_TILES_Y;
-    
+    uint32_t salt = GPU_TILES_X * GPU_TILES_Y; // variable auxiliar que se usa para
+                                               // retroceder el puntero de lectura del mapa
     GPU_spritesRender(&gpu->tableDrawables, &gpu->map, gpu->tiles);
-    SPI1CONbits.MODE32 = 0;
-    GPU_writeCmd(GPU_TFT_RAM_WR);
-    SPI1CONbits.MODE32 = 1;
+
+    // Preparamos el TFT para ser escrito
+    SPI_writeCmd(GPU_TFT_RAM_WR);
+    SPI_MODE_32;
     SPI_TFT_DATA;
     SPI_TFT_SELECT;
-
+    
+    // Buscamos la primera baldosa visible del mapa
     uint8_t *nextTile = gpu->map.tilesMap + (pY * gpu->map.width + pX);
-    uint8_t currentTile = *(nextTile)+1;
+    uint8_t currentTile = *(nextTile)+1; // Esta variable se usa para comprobar si la baldosa
+                                         // que se va a escribir es la misma que la anterior 
+                                         // y reducir tiempos de carga
     for(k = pX; k < kFin; k++){
         for(q = 0; q < GPU_PIXELS_SIZE_J; q++){
             for(i = pY; i < iFin; i++){
-                if(*(nextTile) != currentTile){
-                    currentTile = *(nextTile);
-                    tile = gpu->tableDrawables.drawables[currentTile].tile;
-                    p = gpu->palettes + gpu->tableDrawables.drawables[currentTile].infoDraw.palette;
-                    back = gpu->tableDrawables.drawables[gpu->tableDrawables.drawables[currentTile].infoDraw.back].tile; 
+                if(*(nextTile) != currentTile){ // Comprueba si es distinta a la anterior
+                    currentTile = *(nextTile);  // Si es asi, carga los colores de la nueva baldosa
+                    tile = gpu->tableDrawables.drawables[currentTile].tile; // Primero buscamos la baldosa
+                    p = gpu->palettes + gpu->tableDrawables.drawables[currentTile].infoDraw.palette; // La paleta
+                    back = gpu->tableDrawables.drawables[gpu->tableDrawables.drawables[currentTile].infoDraw.back].tile; // Y el fondo
 
                     //=== COLORES 0-1 ===
-                    pixels1 = tile->pixels[0][q];
-                    if(!pixels1.color1)
-                        pixels1.color1 = back->pixels[0][q].color1;
+                    pixels1 = tile->pixels[0][q]; // Vamos cargando los indices correspondientes a los colores de la paleta
+                    if(!pixels1.color1)           // En caso de ser 0, quiere decir que es transparente
+                        pixels1.color1 = back->pixels[0][q].color1; // y se carga el pixel correspondiente en la baldosa de fondo
                     if(!pixels1.color2)
                         pixels1.color2 = back->pixels[0][q].color2;
-
+                    // Como podemos ver se a desenrollado el bucle for para mejorar la velocidad de escritura del TFT
+                    
                     //=== COLORES 2-3 ===
-                    pixels2 = tile->pixels[1][q];
+                    pixels2 = tile->pixels[1][q];  
                     if(!pixels2.color1)
                         pixels2.color1 = back->pixels[1][q].color1;
                     if(!pixels2.color2)
@@ -422,20 +379,24 @@ void GPU_draw(GPU gpu){
                     if(!pixels4.color2)
                         pixels4.color2 = back->pixels[3][q].color2;
                 }
-                nextTile += GPU_TILES_X;
-                SPI1BUF = p->colors[pixels1.color1] << 16 | p->colors[pixels1.color2];
-                SPI1BUF = p->colors[pixels2.color1] << 16 | p->colors[pixels2.color2];
-                SPI1BUF = p->colors[pixels3.color1] << 16 | p->colors[pixels3.color2];
-                SPI1BUF = p->colors[pixels4.color1] << 16 | p->colors[pixels4.color2];
-                while(SPI1STATbits.SPITBE == 0);
-            } 
-            nextTile -= salt;
-            currentTile = *(nextTile) + 1;
-        }
-        nextTile++;
+                nextTile += GPU_TILES_X; // La baldosa siguiente es la de abajo, no la de su derecha
+                while(SPI1STATbits.TXBUFELM > 2); // Evitamos colapsar la cola de envio
+                SPI1BUF = p->colors[pixels1.color1] << 16 | p->colors[pixels1.color2]; // Cargamos los colores, obtenidos
+                SPI1BUF = p->colors[pixels2.color1] << 16 | p->colors[pixels2.color2]; // a raiz de la paleta, cada pixel,
+                SPI1BUF = p->colors[pixels3.color1] << 16 | p->colors[pixels3.color2]; // se representa mediate 16bits, pero
+                while(SPI1STATbits.TXBUFELM > 4);// Evitamos colapsar la cola de envio //
+                SPI1BUF = p->colors[pixels4.color1] << 16 | p->colors[pixels4.color2]; // se mandan de dos en dos para mejorar la
+                                                                                       // velocidad de carga
+                // Las dos sentencias while estan puestas de esa forma tras prueba y error, buscando eficiencia y a la vez
+            }   // que envie de forma correcta todos los bits
+            nextTile -= salt; // Retrocedemos el puntero hasta la primera fila (El recorrido es por filas)
+            currentTile = *(nextTile) + 1; // Obligamos a cargar la siguiente baldosa ya que aunque sea la misma no hay que olvidar
+        }                                  // que internamente estan formada por 8x8 pixels y lo ultimo cargado es la columna mas a la derecha
+                                           // de la baldosa
+        nextTile++; // Avanzamos a la siguiente columna del mapa
     }
-    SPI1CONbits.ON = 0;
-    SPI1CONbits.ON = 1;
+    SPI1CONbits.ON = 0; // Reiniciamos el modulo ya que es posible que la cola de entrada este en estado de overflow debido a colapsar
+    SPI1CONbits.ON = 1; // la comunicacion con el envio intensivo de bits a TFT
     SPI_TFT_DESELECT;
     GPU_spritesRenderClear(&gpu->tableDrawables, &gpu->map);
 }

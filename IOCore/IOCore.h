@@ -11,6 +11,9 @@
 #ifndef __IOCORE_H__
 #define	__IOCORE_H__
 
+#include <stdint.h>
+#include <xc.h>
+
 //-----  Macros para manejo de pines -----//
 
 #define SDI1_ENABLE SDI1R=0b0001            //Pin 5 gestiona SDI1
@@ -28,6 +31,10 @@
 #define SPI_TFT_DATA SPI_TFT_DC=1                 //Indoca al TFT que se le pasa datos
 #define SPI_MODE_32 SPI1CONbits.MODE32=1;
 #define SPI_MODE_16 SPI1CONbits.MODE32=0;
+
+void SPI_writeData(uint32_t data);
+void SPI_writeCmd(uint32_t cmd);
+void SPI_init();
 
 
 
