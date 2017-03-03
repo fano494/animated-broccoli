@@ -24,19 +24,8 @@ void SPI_writeData(uint32_t data){
 
 void SPI_init(){
     int rData;
-    
-    IEC0bits.T5IE = 0;   // Apagamos el timer5/error, se usan para el control de 
-    IEC0bits.IC5EIE = 0; // interrupciones por lectura, escritura o error
     SPI1CON = 0;         // Reiniciamos la configuracion de SPI1 y lo apagamos
     rData = SPI1BUF;     // Vaciamos el buffer de SPI1
-    IFS0bits.IC5IF = 0;  // Limpiamos el flag del timer5
-    IFS0bits.IC5EIF = 0; // Limpiamos el flag del timer5 error
-    IPC5bits.IC5IP = 3;  // Indicamos una prioridad de 3 para el timer 5
-    IPC5bits.IC5IS = 1;  // Indicamos una subprioridad de 1 para el timer 5
-    //---- TENER CUIDADO CON LAS PRIORIDADES, DADO QUE EL SISTEMA PUEDE ESTAR ----//
-    //----------- MANEJANDO MAS DE UNA INTERRUPCION DE FORMA SIMULTANEA ----------//
-    IEC0bits.T5IE = 1;   // Encendemos el timer5 y timer5 error una vez 
-    IEC0bits.IC5EIE = 1; // configurados
     SPI1BRG = 0x00;      // Elimina cualquier divisor de la frecuencia de reloj SPI1
     SPI1STATbits.SPIROV = 0; // Limpiamos el flag de overflow de SPI1
     SDI1_ENABLE;         // Activamos el pin de MISO
@@ -50,4 +39,59 @@ void SPI_init(){
     SPI1CONbits.MSTEN = 1; // Modo master
     SPI1CONbits.ON = 1; // Encendemos el modulo SPI1
     
+}
+
+void Event_init(){
+    //---- TENER CUIDADO CON LAS PRIORIDADES, DADO QUE EL SISTEMA PUEDE ESTAR ----//
+    //----------- MANEJANDO MAS DE UNA INTERRUPCION DE FORMA SIMULTANEA ----------//
+    __builtin_disable_interrupts();
+    
+    IEC0bits.INT0IE = 0;    // Desactivamos la interrupcion 
+    IPC0bits.INT0IP = 4;    // Indicamos prioridad 4
+    IPC0bits.INT0IS = 1;    // Indicamos sub-prioridad 1
+    IFS0bits.INT0IF = 0;    // Limpiamos los flags de la interrupcion
+    INTCONbits.INT0EP = 0;  // Seleccionamos la polaridad (1 == HIGH, 0 == LOW)
+    IEC0bits.INT0IE = 1;    // Activamos la interrupcion
+    
+    IEC0bits.T4IE = 0;  // Apagamos la interrupcion del timer4
+    IFS0bits.T4IF = 0;  // Limpiamos el flag del timer4
+    T4CONbits.ON = 0;   // Apagamos el modulo del timer
+    T4CONbits.T32 = 0;  // Seleccionamos que sea de 16bits (32 hace que T4 y T5 se junten y sean uno)
+    T4CONbits.SIDL = 0; // En modo idle sigue funcionando con == 0
+    T4CONbits.TCS = 0;  // Seleccionamos que use el reloj interno
+    T4CONbits.TCKPS = 7; // Seleccionamos una escala de 1:256
+    PR4 = 12500;        // Funcionando a 32Mhz realiza unos 10frames/s
+    __builtin_enable_interrupts();
+    
+    ANSELAbits.ANSA0 = 1; // Activamos el pin 2 como lectura analogica
+    TRISAbits.TRISA0 = 1; // Activamos el pin 2 en lectura
+    ANSELAbits.ANSA1 = 1; // Activamos el pin 3 como lectura analogica
+    TRISAbits.TRISA1 = 1; // Activamos el pin 3 en lectura
+    
+    ANSELB = 0;
+    ODCB = 0;
+    TRISB = 0;
+    PORTB = 0;
+    
+    TRISBbits.TRISB0 = 1; // Activamos el pin 4 como lectura digital
+    TRISBbits.TRISB3 = 1; // Activamos el pin 7 como lectura digital
+    TRISBbits.TRISB4 = 1; // Activamos el pin 11 como lectura digital
+    TRISBbits.TRISB5 = 1; // Activamos el pin 14 como lectura digital
+    TRISBbits.TRISB7 = 1; // Activamos el pin 7 como lectura digital
+}
+
+void IO_init(){
+    Event_init();
+    SPI_init();
+}
+
+inline void CLICK_next(){
+    IO_listener();
+    while(IFS0bits.T4IF == 0);
+    IFS0bits.T4IF = 0;
+}
+
+void __ISR(_EXTERNAL_0_VECTOR, IPL4SOFT) _DefaultInterrupt(void){
+    IFS0bits.INT0IF = 0;
+    IO_interrupt();
 }

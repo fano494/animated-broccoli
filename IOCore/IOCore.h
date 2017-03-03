@@ -5,7 +5,7 @@
  * diferentes maneras de comunicacion del pic con  *
  * el dispositivos externos. Ademas de la          * 
  * comunicacion interna mediate eventos.           *
- * V: 1.1.3                                        *
+ * V: 1.1.5                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #ifndef __IOCORE_H__
@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <xc.h>
+#include <sys/attribs.h>
 
 //-----  Macros para manejo de pines -----//
 
@@ -32,11 +33,24 @@
 #define SPI_MODE_32 SPI1CONbits.MODE32=1;
 #define SPI_MODE_16 SPI1CONbits.MODE32=0;
 
+#define EVENT_ANALOG_0 PORTAbits.RA0
+#define EVENT_ANALOG_1 PORTAbits.RA1
+#define EVENT_BUTTON_0 PORTBbits.RB0==0
+#define EVENT_BUTTON_1 PORTBbits.RB3==0
+#define EVENT_BUTTON_2 PORTBbits.RB4==0
+#define EVENT_BUTTON_3 PORTBbits.RB5==0
+
+//----- Macros manejo crono -----//
+#define CLICK_ON T4CONbits.ON=1;
+#define CLICK_OFF T4CONbits.ON=0;
+
 void SPI_writeData(uint32_t data);
 void SPI_writeCmd(uint32_t cmd);
-void SPI_init();
+void IO_init();
 
-
+inline void CLICK_next();
+void IO_listener();
+void IO_interrupt();
 
 #endif	/* IOCORE_H */
 

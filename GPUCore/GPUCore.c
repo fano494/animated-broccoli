@@ -42,6 +42,12 @@
 #define GPU_TFT_VMCTR1  0x00C5
 #define GPU_TFT_VMCTR2  0x00C7
 
+//=== Variable global interna  ===//
+GPU __GPU; // Se declara esta variable global interna la cual simplifica el codigo
+           // de cara a la API de la GPU, haciendo una encapsulacion mas fuerte y
+           // centrando al programador unicamente en implementar el juego y no necesitar
+           // tocar la implentacion de la GPU
+//================================//
 
 
 //==============================================================================
@@ -169,8 +175,8 @@ void GPU_spritesRenderClear(TableDrawables *table, Map *map){
 }
 
 void GPU_init(){
-    SPI_init();
     GPU_TFT_init();
+    __GPU = GPU_new();
     
     
     GPU_black();
@@ -206,7 +212,6 @@ GPU GPU_new(){
         for(i = 0; i < GPU_COLORS_SIZE; i++)
             gpu->palettes[k].colors[i] = 0;
     
-    GPU_init();
     return gpu;
 }
 
@@ -243,33 +248,31 @@ uint16_t GPU_RGB(uint8_t r, uint8_t g, uint8_t b){
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
 
-void GPU_loadMap(GPU gpu, uint8_t *tilesMap, uint16_t height, uint16_t width){
-    if(gpu->map.tilesMap != NULL)
-        free(gpu->map.tilesMap);
-    gpu->map.tilesMap = tilesMap;
-    gpu->map.height = height;
-    gpu->map.width = width;
-    gpu->map.pX = 0;
-    gpu->map.pY = 0;
+void GPU_loadMap(uint8_t *tilesMap, uint16_t height, uint16_t width){
+    __GPU->map.tilesMap = tilesMap;
+    __GPU->map.height = height;
+    __GPU->map.width = width;
+    __GPU->map.pX = 0;
+    __GPU->map.pY = 0;
 }
 
-void GPU_loadTile(GPU gpu, Tile *tiles, uint8_t ini, uint8_t length){
+void GPU_loadTile(Tile *tiles, uint8_t ini, uint8_t length){
     uint8_t i;
     
     for(i = 0; i < length; i++){
-        gpu->tiles[i + ini] = *(tiles[i]);
+        __GPU->tiles[i + ini] = *(tiles[i]);
         free(tiles[i]);
-        tiles[i] = &gpu->tiles[i + ini];
+        tiles[i] = &__GPU->tiles[i + ini];
     }
 }
 
-void GPU_loadPalette(GPU gpu, Palette *palettes, uint8_t ini, uint8_t length){
+void GPU_loadPalette(Palette *palettes, uint8_t ini, uint8_t length){
     uint8_t i;
     
     for(i = 0; i < length; i++){
-        gpu->palettes[i + ini] = *(palettes[i]);
+        __GPU->palettes[i + ini] = *(palettes[i]);
         free(palettes[i]);
-        palettes[i] = &gpu->palettes[i + ini];
+        palettes[i] = &__GPU->palettes[i + ini];
     }
 }
 
@@ -298,37 +301,45 @@ void GPU_black(){
     SPI_TFT_DESELECT;
 }
 
-void GPU_scroll(GPU gpu, int pX, int pY){
-    gpu->map.pX += pX;
-    gpu->map.pY += pY;
+uint8_t GPU_scroll(int pX, int pY){
+    __GPU->map.pX += pX;
+    __GPU->map.pY += pY;
     
     // Comprueba que no nos salimos de los limites del mapa
-    if(gpu->map.pX < 0)
-        gpu->map.pX = 0;
-    else if(gpu->map.pX > gpu->map.width - GPU_TILES_X)
-            gpu->map.pX = gpu->map.width - GPU_TILES_X;
-    
-    if(gpu->map.pY < 0)
-        gpu->map.pY = 0;
-    else if(gpu->map.pY > gpu->map.height - GPU_TILES_Y)
-            gpu->map.pY = gpu->map.height - GPU_TILES_Y;
+    if(__GPU->map.pX < 0){
+        __GPU->map.pX = 0;
+        return 0;
+    }
+    else if(__GPU->map.pX > __GPU->map.width - GPU_TILES_X){
+        __GPU->map.pX = __GPU->map.width - GPU_TILES_X;
+        return 0;
+    }
+    if(__GPU->map.pY < 0){
+        __GPU->map.pY = 0;
+        return 0;
+    }
+    else if(__GPU->map.pY > __GPU->map.height - GPU_TILES_Y){
+        __GPU->map.pY = __GPU->map.height - GPU_TILES_Y;
+        return 0;
+    }
+    return 1;
 
 }
 
-void GPU_draw(GPU gpu){
+void GPU_draw(){
     uint8_t q;
     uint16_t i, k;
     Pixel pixels1, pixels2, pixels3, pixels4;
     Tile tile, back;
     Palette p;
-    int32_t pX = gpu->map.pX; // Cargamos los punteros de scroll en varibles 
-    int32_t pY = gpu->map.pY; // auxiliares para evitar conflictos con un scroll
+    int32_t pX = __GPU->map.pX; // Cargamos los punteros de scroll en varibles 
+    int32_t pY = __GPU->map.pY; // auxiliares para evitar conflictos con un scroll
                               // mediante interrupcion
     uint16_t kFin = pX + GPU_TILES_X;
     uint16_t iFin = pY + GPU_TILES_Y;
-    uint32_t salt = GPU_TILES_X * GPU_TILES_Y; // variable auxiliar que se usa para
+    uint32_t salt = __GPU->map.width * GPU_TILES_Y; // variable auxiliar que se usa para
                                                // retroceder el puntero de lectura del mapa
-    GPU_spritesRender(&gpu->tableDrawables, &gpu->map, gpu->tiles);
+    GPU_spritesRender(&__GPU->tableDrawables, &__GPU->map, __GPU->tiles);
 
     // Preparamos el TFT para ser escrito
     SPI_writeCmd(GPU_TFT_RAM_WR);
@@ -337,7 +348,7 @@ void GPU_draw(GPU gpu){
     SPI_TFT_SELECT;
     
     // Buscamos la primera baldosa visible del mapa
-    uint8_t *nextTile = gpu->map.tilesMap + (pY * gpu->map.width + pX);
+    uint8_t *nextTile = __GPU->map.tilesMap + (pY * __GPU->map.width + pX);
     uint8_t currentTile = *(nextTile)+1; // Esta variable se usa para comprobar si la baldosa
                                          // que se va a escribir es la misma que la anterior 
                                          // y reducir tiempos de carga
@@ -346,9 +357,9 @@ void GPU_draw(GPU gpu){
             for(i = pY; i < iFin; i++){
                 if(*(nextTile) != currentTile){ // Comprueba si es distinta a la anterior
                     currentTile = *(nextTile);  // Si es asi, carga los colores de la nueva baldosa
-                    tile = gpu->tableDrawables.drawables[currentTile].tile; // Primero buscamos la baldosa
-                    p = gpu->palettes + gpu->tableDrawables.drawables[currentTile].infoDraw.palette; // La paleta
-                    back = gpu->tableDrawables.drawables[gpu->tableDrawables.drawables[currentTile].infoDraw.back].tile; // Y el fondo
+                    tile = __GPU->tableDrawables.drawables[currentTile].tile; // Primero buscamos la baldosa
+                    p = __GPU->palettes + __GPU->tableDrawables.drawables[currentTile].infoDraw.palette; // La paleta
+                    back = __GPU->tableDrawables.drawables[__GPU->tableDrawables.drawables[currentTile].infoDraw.back].tile; // Y el fondo
 
                     //=== COLORES 0-1 ===
                     pixels1 = tile->pixels[0][q]; // Vamos cargando los indices correspondientes a los colores de la paleta
@@ -379,7 +390,7 @@ void GPU_draw(GPU gpu){
                     if(!pixels4.color2)
                         pixels4.color2 = back->pixels[3][q].color2;
                 }
-                nextTile += GPU_TILES_X; // La baldosa siguiente es la de abajo, no la de su derecha
+                nextTile += __GPU->map.width; // La baldosa siguiente es la de abajo, no la de su derecha
                 while(SPI1STATbits.TXBUFELM > 2); // Evitamos colapsar la cola de envio
                 SPI1BUF = p->colors[pixels1.color1] << 16 | p->colors[pixels1.color2]; // Cargamos los colores, obtenidos
                 SPI1BUF = p->colors[pixels2.color1] << 16 | p->colors[pixels2.color2]; // a raiz de la paleta, cada pixel,
@@ -388,7 +399,7 @@ void GPU_draw(GPU gpu){
                 SPI1BUF = p->colors[pixels4.color1] << 16 | p->colors[pixels4.color2]; // se mandan de dos en dos para mejorar la
                                                                                        // velocidad de carga
                 // Las dos sentencias while estan puestas de esa forma tras prueba y error, buscando eficiencia y a la vez
-            }   // que envie de forma correcta todos los bits
+            }   // que envie de forma correcta todos los bits. El problema es que el TFT es mas lento que la comunicacion (60ns por bit)
             nextTile -= salt; // Retrocedemos el puntero hasta la primera fila (El recorrido es por filas)
             currentTile = *(nextTile) + 1; // Obligamos a cargar la siguiente baldosa ya que aunque sea la misma no hay que olvidar
         }                                  // que internamente estan formada por 8x8 pixels y lo ultimo cargado es la columna mas a la derecha
@@ -398,7 +409,7 @@ void GPU_draw(GPU gpu){
     SPI1CONbits.ON = 0; // Reiniciamos el modulo ya que es posible que la cola de entrada este en estado de overflow debido a colapsar
     SPI1CONbits.ON = 1; // la comunicacion con el envio intensivo de bits a TFT
     SPI_TFT_DESELECT;
-    GPU_spritesRenderClear(&gpu->tableDrawables, &gpu->map);
+    GPU_spritesRenderClear(&__GPU->tableDrawables, &__GPU->map);
 }
 
 //------------------------------------------------------------------------------
@@ -407,14 +418,14 @@ void GPU_draw(GPU gpu){
 
 //--------------------------- Funciones baldosas -------------------------------
 
-uint8_t GPU_spriteMove(GPU gpu, uint8_t idA, uint16_t sX, uint16_t sY){
-    uint8_t idB = *(gpu->map.tilesMap + (sY * gpu->map.width + sX));
-    Drawable *sprite = &gpu->tableDrawables.drawables[idA];
-    Drawable *back = &gpu->tableDrawables.drawables[idB]; 
+uint8_t GPU_spriteMove(uint8_t idA, uint16_t sX, uint16_t sY){
+    uint8_t idB = *(__GPU->map.tilesMap + (sY * __GPU->map.width + sX));
+    Drawable *sprite = &__GPU->tableDrawables.drawables[idA];
+    Drawable *back = &__GPU->tableDrawables.drawables[idB]; 
 
     if(sprite->infoMove.sprite)
         if(back->infoMove.step){
-            gpu->map.tilesMap[sprite->infoMove.sY * gpu->map.width + sprite->infoMove.sX] = sprite->infoDraw.back;
+            __GPU->map.tilesMap[sprite->infoMove.sY * __GPU->map.width + sprite->infoMove.sX] = sprite->infoDraw.back;
             sprite->infoDraw.back = idB;
             sprite->infoMove.sX = sX;
             sprite->infoMove.sY = sY;
@@ -423,17 +434,28 @@ uint8_t GPU_spriteMove(GPU gpu, uint8_t idA, uint16_t sX, uint16_t sY){
     return 0;
 }
 
-void GPU_setTile(GPU gpu, uint16_t y, uint16_t x, uint8_t tile){
-    gpu->map.tilesMap[y * gpu->map.width + x] = tile;
+uint8_t GPU_spriteNext(uint8_t sprite){
+    __GPU->tableDrawables.drawables[sprite].infoAnim.view = __GPU->tableDrawables.drawables[sprite].infoAnim.next[__GPU->tableDrawables.drawables[sprite].infoAnim.view];
+    __GPU->tableDrawables.drawables[sprite].tile = &__GPU->tiles[__GPU->tableDrawables.drawables[sprite].infoAnim.tile[__GPU->tableDrawables.drawables[sprite].infoAnim.view]];
+    return 0;
 }
 
-uint8_t GPU_addSprite(GPU gpu, uint8_t ini, uint8_t length, uint16_t sX, uint16_t sY){
-    uint16_t i;
-    Drawable *sprite = &(gpu->tableDrawables.drawables[gpu->tableDrawables.length++]);
+uint8_t GPU_reorderAnimation(uint8_t draw, uint8_t tile, uint8_t next){
+    __GPU->tableDrawables.drawables[draw].infoAnim.tile[tile] = next;
+    return 0;
+}
 
-    sprite->tile = &gpu->tiles[ini];
+void GPU_setTile(uint16_t y, uint16_t x, uint8_t tile){
+    __GPU->map.tilesMap[y * __GPU->map.width + x] = tile;
+}
+
+uint8_t GPU_addSprite(uint8_t ini, uint8_t length, uint16_t sX, uint16_t sY){
+    uint16_t i;
+    Drawable *sprite = &(__GPU->tableDrawables.drawables[__GPU->tableDrawables.length++]);
+
+    sprite->tile = &__GPU->tiles[ini];
     sprite->infoAnim.ini = ini;
-    sprite->infoDraw.back = gpu->map.tilesMap[sY * gpu->map.width + sX];
+    sprite->infoDraw.back = __GPU->map.tilesMap[sY * __GPU->map.width + sX];
     sprite->infoAnim.view = 0;
     sprite->infoMove.sY = sY;
     sprite->infoMove.sX = sX;
@@ -452,14 +474,14 @@ uint8_t GPU_addSprite(GPU gpu, uint8_t ini, uint8_t length, uint16_t sX, uint16_
     for(i = 0; i < length; i++)
         sprite->infoAnim.timer[i] = 0;
     
-    return gpu->tableDrawables.length - 1;
+    return __GPU->tableDrawables.length - 1;
 }
 
-uint8_t GPU_addStatic(GPU gpu, uint8_t ini, uint16_t length, uint8_t timer, uint8_t back, uint8_t step){
+uint8_t GPU_addStatic(uint8_t ini, uint16_t length, uint8_t timer, uint8_t back, uint8_t step){
     uint16_t i;
-    Drawable *stac = &(gpu->tableDrawables.drawables[gpu->tableDrawables.length++]);
+    Drawable *stac = &(__GPU->tableDrawables.drawables[__GPU->tableDrawables.length++]);
 
-    stac->tile = &gpu->tiles[ini];
+    stac->tile = &__GPU->tiles[ini];
     stac->infoAnim.ini = ini;
     stac->infoDraw.back = back;
     stac->infoAnim.view = 0;
@@ -478,7 +500,7 @@ uint8_t GPU_addStatic(GPU gpu, uint8_t ini, uint16_t length, uint8_t timer, uint
     for(i = 0; i < length; i++)
         stac->infoAnim.timer[i] = timer;
     
-    return gpu->tableDrawables.length - 1;
+    return __GPU->tableDrawables.length - 1;
 }
 
 //------------------------------------------------------------------------------

@@ -17,6 +17,7 @@
       <itemPath>GPUCore/GPUCore.c</itemPath>
       <itemPath>IOCore/IOCore.h</itemPath>
       <itemPath>IOCore/IOCore.c</itemPath>
+      <itemPath>Tennis.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
