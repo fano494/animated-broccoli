@@ -49,8 +49,8 @@ void SPI_writeCmd(uint32_t cmd);
 void IO_init();
 
 inline void CLICK_next();
-void IO_listener();
-void IO_interrupt();
+void IO_listener(); //--ABSTRACT--//
+void IO_interrupt(); //--ABSTRACT--//
 
 #endif	/* IOCORE_H */
 

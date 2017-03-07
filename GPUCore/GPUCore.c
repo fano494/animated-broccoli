@@ -141,37 +141,26 @@ void GPU_TFT_init(){
     SPI_writeData(GPU_WIDTH-1);
 }
 
-void GPU_spritesRender(TableDrawables *table, Map *map, Tile tiles){
+void GPU_drawablesRender(TableDrawables *table, Tile tiles){
     uint8_t i;
     for(i = 0; i < table->length; i++){ // Recorremos la tabla para renderizar todos los dibujables antes de dibujar la pantalla
         Drawable *curr = &(table->drawables[i]);
-        if(curr->infoDraw.visible){     // Comprobamos si esta visible(Si es statico lo que hace es evitar cambios)
-            if(curr->infoAnim.timer[curr->infoAnim.view]){ // Combrueba si el timer esta activo (timer > 0)
+        
+        if(curr->infoAnim.timer[curr->infoAnim.view]){ // Combrueba si el timer esta activo (timer > 0)
                 
-                if(table->globalTimer % curr->infoAnim.timer[curr->infoAnim.view] == 0){ // Combrueba si es necesario un cambio pasivo
-                    uint8_t next = curr->infoAnim.next[curr->infoAnim.view];  // Obtiene cual es la siguiente baldosa
-                    curr->tile = &(tiles[curr->infoAnim.tile[next]]);  // La busca en memoria y se la pasa al puntero del dibujable
-                    curr->infoAnim.view = next; // Modifica el indice para saber cual se esta viendo ahora
-                }
+            if(table->globalTimer % curr->infoAnim.timer[curr->infoAnim.view] == 0){ // Combrueba si es necesario un cambio pasivo
+                uint8_t next = curr->infoAnim.next[curr->infoAnim.view];  // Obtiene cual es la siguiente baldosa
+                curr->tile = &(tiles[curr->infoAnim.tile[next]]);  // La busca en memoria y se la pasa al puntero del dibujable
+                curr->infoAnim.view = next; // Modifica el indice para saber cual se esta viendo ahora
             }
-            if(curr->infoMove.sprite) // En caso de ser un sprite hay que ubicarlo en el mapa
-                map->tilesMap[curr->infoMove.sY * map->width + curr->infoMove.sX] = i;
-                
-        }
+        }/*
+        else{
+            if(curr->infoMove.sprite){
+                if(map->tilesMap[curr->infoMove.sY * map->width + curr->infoMove.sX] == i)
+            }
+        }*/
     }
     table->globalTimer++;
-}
-
-void GPU_spritesRenderClear(TableDrawables *table, Map *map){
-    uint8_t i;
-    // La finalidad de esta funcion es limpiar de sprites el mapa, de este modo en cada frame 
-    // no perdemos la referencia del fondo en caso de haber mas de un solo dibujable en el mismo
-    // punto.
-    for(i = 0; i < table->length; i++){
-        Drawable *curr = &(table->drawables[i]);
-        if(curr->infoMove.sprite)
-            map->tilesMap[curr->infoMove.sY * map->width + curr->infoMove.sX] = curr->infoDraw.back;
-    }
 }
 
 void GPU_init(){
@@ -339,7 +328,6 @@ void GPU_draw(){
     uint16_t iFin = pY + GPU_TILES_Y;
     uint32_t salt = __GPU->map.width * GPU_TILES_Y; // variable auxiliar que se usa para
                                                // retroceder el puntero de lectura del mapa
-    GPU_spritesRender(&__GPU->tableDrawables, &__GPU->map, __GPU->tiles);
 
     // Preparamos el TFT para ser escrito
     SPI_writeCmd(GPU_TFT_RAM_WR);
@@ -409,7 +397,15 @@ void GPU_draw(){
     SPI1CONbits.ON = 0; // Reiniciamos el modulo ya que es posible que la cola de entrada este en estado de overflow debido a colapsar
     SPI1CONbits.ON = 1; // la comunicacion con el envio intensivo de bits a TFT
     SPI_TFT_DESELECT;
-    GPU_spritesRenderClear(&__GPU->tableDrawables, &__GPU->map);
+}
+
+void GPU_run(){
+    CLICK_ON;
+    while(1){
+        GPU_draw();
+        GPU_controller();
+        CLICK_next();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -419,19 +415,33 @@ void GPU_draw(){
 //--------------------------- Funciones baldosas -------------------------------
 
 uint8_t GPU_spriteMove(uint8_t idA, uint16_t sX, uint16_t sY){
-    uint8_t idB = *(__GPU->map.tilesMap + (sY * __GPU->map.width + sX));
-    Drawable *sprite = &__GPU->tableDrawables.drawables[idA];
-    Drawable *back = &__GPU->tableDrawables.drawables[idB]; 
-
-    if(sprite->infoMove.sprite)
-        if(back->infoMove.step){
-            __GPU->map.tilesMap[sprite->infoMove.sY * __GPU->map.width + sprite->infoMove.sX] = sprite->infoDraw.back;
-            sprite->infoDraw.back = idB;
-            sprite->infoMove.sX = sX;
-            sprite->infoMove.sY = sY;
-            return 1;
+    uint8_t idB = __GPU->map.tilesMap[sY * __GPU->map.width + sX];
+    if(idB != idA){
+        Drawable *draw = &__GPU->tableDrawables.drawables[idA];
+        Drawable *toGo = &__GPU->tableDrawables.drawables[idB];
+        if(toGo->infoMove.step){
+            if(draw->infoDraw.sup){
+                Drawable *sup = &__GPU->tableDrawables.drawables[draw->infoDraw.sup];
+                sup->infoDraw.back = draw->infoDraw.back;
+                draw->infoDraw.sup = 0;
+            }
+            else{
+                Drawable *back = &__GPU->tableDrawables.drawables[draw->infoDraw.back];
+                back->infoDraw.sup = 0;
+                __GPU->map.tilesMap[draw->infoMove.sY * __GPU->map.width + draw->infoMove.sX] = draw->infoDraw.back;
+            }
+            draw->infoMove.sX = sX;
+            draw->infoMove.sY = sY;
+            if(toGo->infoMove.sprite){
+                toGo->infoDraw.sup = idA;
+            }
+            draw->infoDraw.back = idB;
+            __GPU->map.tilesMap[draw->infoMove.sY * __GPU->map.width + draw->infoMove.sX] = idA;
         }
-    return 0;
+        else
+            return 0;
+    }
+    return 1;
 }
 
 uint8_t GPU_spriteNext(uint8_t sprite){
@@ -449,18 +459,19 @@ void GPU_setTile(uint16_t y, uint16_t x, uint8_t tile){
     __GPU->map.tilesMap[y * __GPU->map.width + x] = tile;
 }
 
-uint8_t GPU_addSprite(uint8_t ini, uint8_t length, uint16_t sX, uint16_t sY){
+uint8_t GPU_addSprite(uint8_t ini, uint8_t length, uint8_t step){
     uint16_t i;
     Drawable *sprite = &(__GPU->tableDrawables.drawables[__GPU->tableDrawables.length++]);
 
     sprite->tile = &__GPU->tiles[ini];
     sprite->infoAnim.ini = ini;
-    sprite->infoDraw.back = __GPU->map.tilesMap[sY * __GPU->map.width + sX];
+    sprite->infoDraw.back = 0;
+    sprite->infoDraw.sup = 0;
     sprite->infoAnim.view = 0;
-    sprite->infoMove.sY = sY;
-    sprite->infoMove.sX = sX;
+    sprite->infoMove.sY = 0;
+    sprite->infoMove.sX = 0;
     sprite->infoMove.sprite = 1;
-    sprite->infoMove.step = 1;
+    sprite->infoMove.step = step;
     sprite->infoDraw.palette = 0;
     sprite->infoDraw.visible = 1;
     sprite->infoAnim.next = (uint8_t *) malloc(sizeof(uint8_t) * length);
@@ -484,6 +495,7 @@ uint8_t GPU_addStatic(uint8_t ini, uint16_t length, uint8_t timer, uint8_t back,
     stac->tile = &__GPU->tiles[ini];
     stac->infoAnim.ini = ini;
     stac->infoDraw.back = back;
+    stac->infoDraw.sup = 0;
     stac->infoAnim.view = 0;
     stac->infoMove.sprite = 0;
     stac->infoMove.step = step;

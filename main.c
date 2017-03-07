@@ -381,8 +381,8 @@ void main(void){/*
     Tennis();
     return;
 }
-
-void IO_listener(){/*
+/*
+void IO_listener(){
     if(EVENT_BUTTON_0){
         if(!dd){
             GPU_spriteNext(player1);
@@ -422,10 +422,10 @@ void IO_listener(){/*
             GPU_spriteMove(player5, aa, 16);
             GPU_spriteMove(player6, aa+1, 16);
         }
-    }*/
+    }
 }
 
-void IO_interrupt(){/*
+void IO_interrupt(){
     if(!dd){
             GPU_spriteNext(player1);
             GPU_spriteNext(player2);
@@ -443,5 +443,5 @@ void IO_interrupt(){/*
             GPU_spriteMove(player4, aa+1, 15);
             GPU_spriteMove(player5, aa, 16);
             GPU_spriteMove(player6, aa+1, 16);
-    }*/
-}
+    }
+}*/

@@ -79,6 +79,7 @@ struct Map{
 
 //===== InfoDraw =====
 struct InfoDraw{
+    uint8_t sup;
     uint8_t back;        // Posicion de la baldosa de fondo
     uint8_t palette : 3; // Paleta seleccionada para esta baldosa[0-7]
     uint8_t visible : 1;  // Nos indica si hay que dibujarlo o no
@@ -147,10 +148,12 @@ uint16_t GPU_RGB(uint8_t r, uint8_t g, uint8_t b);
 void GPU_black();
 uint8_t GPU_scroll(int pX, int pY);
 void GPU_draw();
+void GPU_run();
+void GPU_controller(); //--ABSTRACT--//
 
 void GPU_setTile(uint16_t y, uint16_t x, uint8_t tile);
 
-uint8_t GPU_addSprite(uint8_t ini, uint8_t length, uint16_t sX, uint16_t sY);
+uint8_t GPU_addSprite(uint8_t ini, uint8_t length, uint8_t step);
 uint8_t GPU_addStatic(uint8_t ini, uint16_t length, uint8_t timer, uint8_t back, uint8_t step);
 uint8_t GPU_spriteMove(uint8_t idA, uint16_t sX, uint16_t sY);
 uint8_t GPU_spriteNext(uint8_t sprite);
