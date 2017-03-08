@@ -35,6 +35,8 @@
 #define GPU_TFT_PIX_SIZE    0x003A //Tamaño del pixel
 #define GPU_TFT_PIX_16      0x5500 //16 bit por pixel
 
+
+//--- Control de corriente ---//
 #define GPU_TFT_FRMCTR1 0x00B1
 #define GPU_TFT_PWCTR1  0x00C0
 #define GPU_TFT_PWCTR2  0x00C1
@@ -142,6 +144,7 @@ void GPU_TFT_init(){
 }
 
 void GPU_drawablesRender(TableDrawables *table, Tile tiles){
+    // Se encarga de actualizar los dibujables que tienen alguna animacion pasiva activa
     uint8_t i;
     for(i = 0; i < table->length; i++){ // Recorremos la tabla para renderizar todos los dibujables antes de dibujar la pantalla
         Drawable *curr = &(table->drawables[i]);
@@ -153,34 +156,10 @@ void GPU_drawablesRender(TableDrawables *table, Tile tiles){
                 curr->tile = &(tiles[curr->infoAnim.tile[next]]);  // La busca en memoria y se la pasa al puntero del dibujable
                 curr->infoAnim.view = next; // Modifica el indice para saber cual se esta viendo ahora
             }
-        }/*
-        else{
-            if(curr->infoMove.sprite){
-                if(map->tilesMap[curr->infoMove.sY * map->width + curr->infoMove.sX] == i)
-            }
-        }*/
+        }
     }
     table->globalTimer++;
 }
-
-void GPU_init(){
-    GPU_TFT_init();
-    __GPU = GPU_new();
-    
-    
-    GPU_black();
-    GPU_black();
-    GPU_black();
-    GPU_black(); 
-}
-
-
-//==============================================================================
-//========================== Funciones publicas ================================
-//==============================================================================
-
-//------------------------------ Constructores ---------------------------------
-
 GPU GPU_new(){
     // Inicializa un driver para la gpu, reserva la memoria minima para poder usarla
     // y prepara algunos de las sub clases de las que se compone.
@@ -202,6 +181,25 @@ GPU GPU_new(){
             gpu->palettes[k].colors[i] = 0;
     
     return gpu;
+}
+
+
+//==============================================================================
+//========================== Funciones publicas ================================
+//==============================================================================
+
+//------------------------------ Constructores ---------------------------------
+void GPU_init(){
+    // Inicializa la GPU configurandola para su uso e instanciando una que actuara por debajo de la implementacion
+    // de forma oculta
+    GPU_TFT_init();
+    __GPU = GPU_new();
+    
+    // Se dan cuatro pantallazos negros para limpiar la pantalla tras el arranque
+    GPU_black(); 
+    GPU_black();
+    GPU_black();
+    GPU_black(); 
 }
 
 Tile GPU_newTile(uint8_t pixels[GPU_PIXELS_SIZE_I][GPU_PIXELS_SIZE_J]){
@@ -291,27 +289,28 @@ void GPU_black(){
 }
 
 uint8_t GPU_scroll(int pX, int pY){
+    uint8_t b = 1;
     __GPU->map.pX += pX;
     __GPU->map.pY += pY;
     
     // Comprueba que no nos salimos de los limites del mapa
     if(__GPU->map.pX < 0){
         __GPU->map.pX = 0;
-        return 0;
+        b = 0;
     }
     else if(__GPU->map.pX > __GPU->map.width - GPU_TILES_X){
         __GPU->map.pX = __GPU->map.width - GPU_TILES_X;
-        return 0;
+        b = 0;
     }
     if(__GPU->map.pY < 0){
         __GPU->map.pY = 0;
-        return 0;
+        b = 0;
     }
     else if(__GPU->map.pY > __GPU->map.height - GPU_TILES_Y){
         __GPU->map.pY = __GPU->map.height - GPU_TILES_Y;
-        return 0;
+        b = 0;
     }
-    return 1;
+    return b;
 
 }
 
@@ -400,11 +399,12 @@ void GPU_draw(){
 }
 
 void GPU_run(){
-    CLICK_ON;
+    CLICK_ON; // Encendemos el timer para controlar el refresco (frames)
     while(1){
-        GPU_draw();
-        GPU_controller();
-        CLICK_next();
+        // Secuencia basica de ejecucion de un programa
+        GPU_draw(); // Refrescamos pantalla
+        GPU_controller(); // Ejecutamos la parte de codigo que contiene la logica del programa
+        CLICK_next(); // Comprobamos los posibles eventos por entradas externas y el timer nos indica la salida
     }
 }
 
@@ -415,48 +415,70 @@ void GPU_run(){
 //--------------------------- Funciones baldosas -------------------------------
 
 uint8_t GPU_spriteMove(uint8_t idA, uint16_t sX, uint16_t sY){
+    // Obtenemos id del dibujable que se va a pisar
     uint8_t idB = __GPU->map.tilesMap[sY * __GPU->map.width + sX];
+    // Si es el mismo, no se hace ningun cambio
     if(idB != idA){
-        Drawable *draw = &__GPU->tableDrawables.drawables[idA];
+        // Obtenemos el dibujable que va a ser pisado
         Drawable *toGo = &__GPU->tableDrawables.drawables[idB];
+        // Comprobamos que se pueda pisar
         if(toGo->infoMove.step){
+            // Obtememos el dibujable que queremos mover
+            Drawable *draw = &__GPU->tableDrawables.drawables[idA];
+            // Si en su origen no era superior, informa del cambio a su superior
             if(draw->infoDraw.sup){
                 Drawable *sup = &__GPU->tableDrawables.drawables[draw->infoDraw.sup];
-                sup->infoDraw.back = draw->infoDraw.back;
+                sup->infoDraw.back = draw->infoDraw.back; // Modificamos el back de superior
                 draw->infoDraw.sup = 0;
             }
+            // Si en su origen era superior(visible), cambia el visible en el mapa
             else{
                 Drawable *back = &__GPU->tableDrawables.drawables[draw->infoDraw.back];
                 back->infoDraw.sup = 0;
                 __GPU->map.tilesMap[draw->infoMove.sY * __GPU->map.width + draw->infoMove.sX] = draw->infoDraw.back;
             }
+            // Cambio de coordenadas
             draw->infoMove.sX = sX;
             draw->infoMove.sY = sY;
+            // Si el destino es un sprite tenemos que cambiar su superior por el movido
             if(toGo->infoMove.sprite){
                 toGo->infoDraw.sup = idA;
             }
+            // Guardamos el nuevo back del movido
             draw->infoDraw.back = idB;
+            // Cambiamos en el mapa para que sea visible
             __GPU->map.tilesMap[draw->infoMove.sY * __GPU->map.width + draw->infoMove.sX] = idA;
         }
         else
+            // Devolvemos 0 en caso de no poder pisar (Colision)
             return 0;
     }
+    // Devolvemos 1 en caso de no haber colision
     return 1;
 }
 
 uint8_t GPU_spriteNext(uint8_t sprite){
+    // Movemos de forma manual la animacion del sprite
     __GPU->tableDrawables.drawables[sprite].infoAnim.view = __GPU->tableDrawables.drawables[sprite].infoAnim.next[__GPU->tableDrawables.drawables[sprite].infoAnim.view];
     __GPU->tableDrawables.drawables[sprite].tile = &__GPU->tiles[__GPU->tableDrawables.drawables[sprite].infoAnim.tile[__GPU->tableDrawables.drawables[sprite].infoAnim.view]];
     return 0;
 }
 
 uint8_t GPU_reorderAnimation(uint8_t draw, uint8_t tile, uint8_t next){
+    // Cambio de orden de la animacion
     __GPU->tableDrawables.drawables[draw].infoAnim.tile[tile] = next;
     return 0;
 }
 
-void GPU_setTile(uint16_t y, uint16_t x, uint8_t tile){
-    __GPU->map.tilesMap[y * __GPU->map.width + x] = tile;
+uint8_t GPU_staticSet(uint8_t idA, uint16_t sX, uint16_t sY){
+    uint32_t toGo = sY * __GPU->map.width + sX;
+    if(!__GPU->tableDrawables.drawables[__GPU->map.tilesMap[toGo]].infoMove.sprite){
+        __GPU->map.tilesMap[toGo] = idA;
+        // En caso de que no este ocupada la casilla por un sprite se hace el set
+        return 1;
+    }
+    // Sobre sprites no se permiten set's (tiene prioridad el sprite)
+    return 0;
 }
 
 uint8_t GPU_addSprite(uint8_t ini, uint8_t length, uint8_t step){
@@ -465,7 +487,7 @@ uint8_t GPU_addSprite(uint8_t ini, uint8_t length, uint8_t step){
 
     sprite->tile = &__GPU->tiles[ini];
     sprite->infoAnim.ini = ini;
-    sprite->infoDraw.back = 0;
+    sprite->infoDraw.back = __GPU->map.tilesMap[0];
     sprite->infoDraw.sup = 0;
     sprite->infoAnim.view = 0;
     sprite->infoMove.sY = 0;
