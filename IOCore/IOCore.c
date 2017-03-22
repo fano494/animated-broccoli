@@ -92,6 +92,7 @@ inline void CLICK_next(){
 }
 
 void __ISR(_EXTERNAL_0_VECTOR, IPL4SOFT) _DefaultInterrupt(void){
-    IFS0bits.INT0IF = 0;
     IO_interrupt();
+    while(EVENT_BUTTON_INT);
+    IFS0bits.INT0IF = 0;
 }

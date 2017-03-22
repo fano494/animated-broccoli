@@ -39,18 +39,71 @@
 #define EVENT_BUTTON_1 PORTBbits.RB3==0
 #define EVENT_BUTTON_2 PORTBbits.RB4==0
 #define EVENT_BUTTON_3 PORTBbits.RB5==0
+#define EVENT_BUTTON_INT PORTBbits.RB7==0
 
 //----- Macros manejo crono -----//
 #define CLICK_ON T4CONbits.ON=1;
 #define CLICK_OFF T4CONbits.ON=0;
 
+// GPU_transfer()
+// Ent: 
+//  data -> Dato que deseamos enviar por el modulo SPI (4 bytes)
+// Sal:
+//  data -> Dato leido del modulo SPI
+// Des: Funcion que nos permite hacer una transferencia SPI de 32bits de tamaño,
+// no hay que olvidar que en SPI se envia y se recive a la vez, de modo que si
+// queremos enviar introducimos el dato en la entrada y si queremos leer, la 
+// entrada deben de ser todo unos y nos retornara la salida. 
+uint32_t SPI_transfer(uint32_t data);
+
+// GPU_writeData()
+// Ent: 
+//  data -> Dato que deseamos enviar por al TFT (4 bytes)
+// Sal: --
+// Des: Funcion que nos permite enviar un dato al TFT (no olvidar que son 32bits)
 void SPI_writeData(uint32_t data);
+
+// GPU_writeCmd()
+// Ent: 
+//  cmd -> Comando que deseamos enviar por al TFT (4 bytes)
+// Sal: --
+// Des: Funcion que nos permite enviar un comando al TFT (no olvidar que son 32bits)
 void SPI_writeCmd(uint32_t cmd);
+
+// GPU_init()
+// Ent: --
+// Sal: --
+// Des: Funcion que inicializa el modulo SPI, la interrupcion externa, el timer y
+// los pines de entrada. Prepara el PIC para gestionar las entradas y las salidas
+// de forma correcta.
 void IO_init();
 
+// GPU_next()
+// Ent: --
+// Sal: --
+// Des: Funcion que se encarga de revisar si ha habido alguna peticion de entrada
+// y de fraccionar en margenes de tiempo iguales por cada CLICK, de este modo 
+// podemos obtener frames mas o menos estables, haciendo que duren todos lo mismo
+// En caso de estar usando la libreria GPU y el modelo establecido por GPU_run,
+// esta funcion es gestionada de forma opaca y no es necesaria para el programador
 inline void CLICK_next();
-void IO_listener(); //--ABSTRACT--//
-void IO_interrupt(); //--ABSTRACT--//
+
+// GPU_next() ##### ABSTRACT #####
+// Ent: --
+// Sal: --
+// Des: Funcion abstracta que debe ser implementada por el programador en la que
+// se incluira la logica de cada boton.
+void IO_listener(); 
+
+// GPU_next() ##### ABSTRACT #####
+// Ent: --
+// Sal: --
+// Des: Funcion abstracta que debe ser implementada por el programador en la que
+// se incluira la logica de la interrupcion externa. La interrupcion no es gestionada
+// por CLICK de modo que es asincrona y se ejecuta en cuanto ocurre. Tambien hay que
+// decir que no es persistente de modo que solo se ejecuta una unica vez y es necesario
+// que pase a desactivada y luego a activada otra vez para que se vuelva a considerar.
+void IO_interrupt();
 
 #endif	/* IOCORE_H */
 

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/production/Nexus.X.production.elf">                 
+  <executable name="dist/default/debug/Nexus.X.debug.elf">                 
     <memory name="program">                 
       <units>bytes</units>                 
       <length>70800</length>                 
-      <used>17472</used>                     
-      <free>53328</free>                     
+      <used>17492</used>                     
+      <free>53308</free>                     
     </memory>                              
     <memory name="data">              
       <units>bytes</units>                 
       <length>65536</length>                 
-      <used>50476</used>                     
-      <free>15060</free>                     
+      <used>50988</used>                     
+      <free>14548</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

@@ -17,6 +17,7 @@
 #include <xc.h>
 
 #define GPU_TILES_SIZE 60
+#define GPU_TILESMAP_SIZE 1024*30
 #define GPU_PIXELS_SIZE_I 4
 #define GPU_PIXELS_SIZE_J 8
 #define GPU_PALETTES_SIZE 8
@@ -74,7 +75,7 @@ struct Map{
     uint16_t width; //Anchura del mapa (Se usa para leer el array)
     int32_t pY; //Indica donde empieza a leer en Y (Son necesarios los negativos para el scroll)
     int32_t pX; //Indica donde empueza a leer en X (Son necesarios los negativos para el scroll)
-    uint8_t *tilesMap; //Puntero que contiene el mapa de baldosas
+    uint8_t tilesMap[GPU_TILESMAP_SIZE]; //Puntero que contiene el mapa de baldosas
 };
 
 //===== InfoDraw =====
@@ -97,9 +98,9 @@ struct InfoMove{
 struct InfoAnim{
     uint8_t ini;     // Baldosa inicial del ciclo de animacion       
     uint8_t view;    // Baldosa que se esta viendo actualmente
-    uint8_t *timer;  // Velocidad de la animacion
-    uint8_t *next;   // Baldosa a la que pasa dentro del sprite
-    uint8_t *tile;
+    uint8_t timer[16];  // Velocidad de la animacion
+    uint8_t next[16];   // Baldosa a la que pasa dentro del sprite
+    uint8_t tile[16];
 };
 
 //===== Drawable =====
@@ -229,14 +230,7 @@ void GPU_draw();
 // los refrescos de pantalla, el manejo de eventos y el control del paso de frames. De este
 // modo, si se usa esta funcion solo es necesario implementar GPU_controller, IO_interrupt y
 // IO_listener, todo lo demas se gestiona de forma opaca.
-void GPU_run();
-
-// GPU_controller()##### ABSTRACT #####
-// Ent: --
-// Sal: --
-// Des: Funcion abstracta en la que incluiremos la logica del programa. Usar solo si se 
-// esta programando mediante el modelo gestionado por GPU_run
-void GPU_controller(); 
+void GPU_run(); 
 
 uint8_t GPU_addSprite(uint8_t ini, uint8_t length, uint8_t step);
 uint8_t GPU_addStatic(uint8_t ini, uint16_t length, uint8_t timer, uint8_t back, uint8_t step);

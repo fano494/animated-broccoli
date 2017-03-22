@@ -1,5 +1,5 @@
-build/default/production/main.o:  \
-main.c  \
+build/default/production/Tennis.o:  \
+Tennis.c  \
 Tennis.h  \
 HALCore/HALCore.h  \
  HALCore/../GPUCore/GPUCore.h  \
