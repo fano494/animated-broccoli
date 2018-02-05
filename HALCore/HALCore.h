@@ -1,9 +1,12 @@
-/* 
- * File:   HALCore.h
- * Author: Fano
- *
- * Created on 21 de marzo de 2017, 0:51
- */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Autor: Stefano Vidaurre Olite                   *
+ * Fecha: 24/11/2016                               *
+ * Descripcion: Libreria encargada de inplentar las*
+ * diferentes maneras de comunicacion del pic con  *
+ * el dispositivos externos. Ademas de la          * 
+ * comunicacion interna mediate eventos.           *
+ * V: 1.1.8                                        *
+ * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #ifndef HALCORE_H
 #define	HALCORE_H
@@ -16,15 +19,11 @@
 #define BUTTON_3 HAL_button_3()
 #define BUTTON_INT HAL_button_4()
 
-Tile __attribute__((address(0x9D001000))) newTile(uint8_t pixels[GPU_PIXELS_SIZE_I][GPU_PIXELS_SIZE_J]);
+void __attribute__((address(0x9D001000))) newTile(uint8_t index, uint8_t pixels[GPU_PIXELS_SIZE_I][GPU_PIXELS_SIZE_J]);
 
-Palette __attribute__((address(0x9D001100))) newPalette(uint8_t colors[GPU_COLORS_SIZE][3]);
+void __attribute__((address(0x9D001100))) newPalette(uint8_t index, uint8_t colors[GPU_COLORS_SIZE][3]);
 
 void __attribute__((address(0x9D001200))) loadMap(uint8_t *tilesMap, uint16_t height, uint16_t width);
-
-void __attribute__((address(0x9D001300))) loadTile(Tile *tiles, uint8_t ini, uint8_t length);
-
-void __attribute__((address(0x9D001400))) loadPalette(Palette *palettes, uint8_t ini, uint8_t length);
 
 uint16_t __attribute__((address(0x9D001500))) RGB(uint8_t r, uint8_t g, uint8_t b);
 
@@ -60,12 +59,16 @@ uint8_t __attribute__((address(0x9D002400))) HAL_button_3();
 
 uint8_t __attribute__((address(0x9D002500))) HAL_button_INT();
 
+void __attribute__((address(0x9D002600))) loadFont();
+
+uint8_t __attribute__((address(0x9D002700))) loadProgram();
+
 // GPU_controller()##### ABSTRACT #####
 // Ent: --
 // Sal: --
 // Des: Funcion abstracta en la que incluiremos la logica del programa. Usar solo si se 
 // esta programando mediante el modelo gestionado por GPU_run
-void __attribute__((section(".funcdin"))) controller();
+void controller();
 
 #endif	/* HALCORE_H */
 

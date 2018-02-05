@@ -3,15 +3,15 @@
   <executable name="dist/default/debug/Nexus.X.debug.elf">                 
     <memory name="program">                 
       <units>bytes</units>                 
-      <length>70800</length>                 
-      <used>17492</used>                     
-      <free>53308</free>                     
+      <length>210063</length>                 
+      <used>5556</used>                     
+      <free>204507</free>                     
     </memory>                              
     <memory name="data">              
       <units>bytes</units>                 
-      <length>65536</length>                 
-      <used>50988</used>                     
-      <free>14548</free>                     
+      <length>66048</length>                 
+      <used>40212</used>                     
+      <free>25836</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

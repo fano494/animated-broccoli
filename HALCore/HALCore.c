@@ -3,24 +3,16 @@
 typedef void* (*Func)();
 Func fun;
 
-Tile newTile(uint8_t pixels[GPU_PIXELS_SIZE_I][GPU_PIXELS_SIZE_J]){
-    return GPU_newTile(pixels);
+void newTile(uint8_t index, uint8_t pixels[GPU_PIXELS_SIZE_I][GPU_PIXELS_SIZE_J]){
+    GPU_newTile(index, pixels);
 }
 
-Palette newPalette(uint8_t colors[GPU_COLORS_SIZE][3]){
-    return GPU_newPalette(colors);
+void newPalette(uint8_t index, uint8_t colors[GPU_COLORS_SIZE][3]){
+    GPU_newPalette(index, colors);
 }
 
 void loadMap(uint8_t *tilesMap, uint16_t height, uint16_t width){
     GPU_loadMap(tilesMap, height, width);
-}
-
-void loadTile(Tile *tiles, uint8_t ini, uint8_t length){
-    GPU_loadTile(tiles, ini, length);
-}
-
-void loadPalette(Palette *palettes, uint8_t ini, uint8_t length){
-    GPU_loadPalette(palettes, ini, length);
 }
 
 uint16_t RGB(uint8_t r, uint8_t g, uint8_t b){
@@ -90,4 +82,8 @@ uint8_t HAL_button_3(){
 
 uint8_t HAL_button_INT(){
     return EVENT_BUTTON_INT;
+}
+
+void loadFont(){
+    GPU_loadFont();
 }

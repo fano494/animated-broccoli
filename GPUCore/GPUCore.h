@@ -5,7 +5,7 @@
  * los graficos, renderizacion, y transmision de   *
  * los frames generados, al TFT mediante SPI.      *
  *                                                 *
- * V: 1.1.6                                        *
+ * V: 1.1.8                                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #ifndef __GPUCORE_H__
@@ -16,8 +16,10 @@
 #include "../IOCore/IOCore.h"
 #include <xc.h>
 
-#define GPU_TILES_SIZE 60
-#define GPU_TILESMAP_SIZE 1024*30
+#define GPU_TILES_SIZE 256
+#define GPU_FONT_SIZE 26
+#define GPU_TILESMAP_SIZE 1024*20
+#define GPU_ANIM_SIZE 8
 #define GPU_PIXELS_SIZE_I 4
 #define GPU_PIXELS_SIZE_J 8
 #define GPU_PALETTES_SIZE 8
@@ -32,7 +34,6 @@
 
 typedef struct GPU *GPU;
 typedef struct Pixel Pixel;
-typedef struct Tile *Tile;
 typedef struct Palette *Palette;
 typedef struct TableDrawables TableDrawables;
 typedef struct Drawable Drawable;
@@ -40,6 +41,36 @@ typedef struct InfoDraw InfoDraw;
 typedef struct InfoMove InfoMove;
 typedef struct InfoAnim InfoAnim;
 typedef struct Map Map;
+
+//===== FONT ======
+// Indices del conjunto de letras y numeros
+#define GPU_FONT_INI GPU_TILES_SIZE - GPU_FONT_SIZE
+#define GPU_FONT_A 185
+#define GPU_FONT_B 186
+#define GPU_FONT_C 187
+#define GPU_FONT_D 188
+#define GPU_FONT_E 189
+#define GPU_FONT_F 190
+#define GPU_FONT_G 191
+#define GPU_FONT_H 192
+#define GPU_FONT_I 193
+#define GPU_FONT_J 194
+#define GPU_FONT_K 195
+#define GPU_FONT_L 196
+#define GPU_FONT_M 197
+#define GPU_FONT_N 198
+#define GPU_FONT_O 199
+#define GPU_FONT_P 200
+#define GPU_FONT_Q 201
+#define GPU_FONT_R 202
+#define GPU_FONT_S 203
+#define GPU_FONT_T 204
+#define GPU_FONT_U 205
+#define GPU_FONT_V 206
+#define GPU_FONT_W 207
+#define GPU_FONT_X 208
+#define GPU_FONT_Y 209
+#define GPU_FONT_Z 210
 
 //===== Pixel =====
 // Clase usada para guardar la informacion de dos pixels, uno situado (color2)
@@ -98,9 +129,9 @@ struct InfoMove{
 struct InfoAnim{
     uint8_t ini;     // Baldosa inicial del ciclo de animacion       
     uint8_t view;    // Baldosa que se esta viendo actualmente
-    uint8_t timer[16];  // Velocidad de la animacion
-    uint8_t next[16];   // Baldosa a la que pasa dentro del sprite
-    uint8_t tile[16];
+    uint8_t timer[GPU_ANIM_SIZE];  // Velocidad de la animacion
+    uint8_t next[GPU_ANIM_SIZE];   // Baldosa a la que pasa dentro del sprite
+    uint8_t tile[GPU_ANIM_SIZE];
 };
 
 //===== Drawable =====
@@ -109,7 +140,7 @@ struct InfoAnim{
 // dado que al no ser staticos en el tiempo hay que hacer modificaciones en el 
 // tilesMap.
 struct Drawable{
-    Tile tile; //Puntero hacia la baldosa que se muestra
+    struct Tile *tile; //Puntero hacia la baldosa que se muestra
     InfoDraw infoDraw;
     InfoMove infoMove;
     InfoAnim infoAnim;
@@ -141,7 +172,7 @@ struct GPU{
 // Sal: --
 // Des: Se encarga de inicializar la GPU, es necesario ejecutarlo al principio
 // del programa, sin el no funciona la API.
-void GPU_init();
+void __attribute__((section(".KERNEL_CODE"))) GPU_init();
 
 // GPU_newTile()
 // Ent: 
@@ -150,7 +181,7 @@ void GPU_init();
 //  Tile -> Baldosa formada por los pixels de entrada
 // Des: Permite crear baldosas de forma independiente, de este modo se pueden
 // guardar dentro de la GPU o en una memoria externa para ser cargadas despues
-Tile GPU_newTile(uint8_t pixels[GPU_PIXELS_SIZE_I][GPU_PIXELS_SIZE_J]);
+void __attribute__((section(".KERNEL_CODE"))) GPU_newTile(uint8_t index, uint8_t pixels[GPU_PIXELS_SIZE_I][GPU_PIXELS_SIZE_J]);
 
 // GPU_newPalette()
 // Ent: 
@@ -159,7 +190,7 @@ Tile GPU_newTile(uint8_t pixels[GPU_PIXELS_SIZE_I][GPU_PIXELS_SIZE_J]);
 //  Tile -> Paleta formada por los colores de entrada
 // Des: Permite crear paletas de forma independiente, de este modo se pueden
 // guardar dentro de la GPU o en una memoria externa para ser cargadas despues
-Palette GPU_newPalette(uint8_t colors[GPU_COLORS_SIZE][3]);
+void __attribute__((section(".KERNEL_CODE"))) GPU_newPalette(uint8_t index, uint8_t colors[GPU_COLORS_SIZE][3]);
 
 // GPU_loadMap()
 // Ent: 
@@ -169,27 +200,7 @@ Palette GPU_newPalette(uint8_t colors[GPU_COLORS_SIZE][3]);
 // Sal: --
 // Des: Funcion que carga un mapa (matriz de uint8_t), la cual mostrara la GPU
 // por la pantalla. Esta formada por los indices de los objetos dibujables!!
-void GPU_loadMap(uint8_t *tilesMap, uint16_t height, uint16_t width);
-
-// GPU_loadTile()
-// Ent:
-//  tiles -> Puntero en el que encontramos las baldosas que queremos cargar
-//  ini -> Posicion de memoria destinada a las baldosas dentro de la GPU en la que queremos empezar
-//  lenght -> Numero de baldosas que vamos a cargar (>= 1)
-// Sal: --
-// Des: Funcion que nos permite cargar en la GPU un conjunto de baldosas, sustituyendo
-// unas ya existentes en concreto o añadir mas (Tener en cuenta tamaño maximo)
-void GPU_loadTile(Tile *tiles, uint8_t ini, uint8_t length);
-
-// GPU_loadPalette()
-// Ent:
-//  palettes -> Puntero en el que encontramos las paletas que queremos cargar
-//  ini -> Posicion de memoria destinada a las paletas dentro de la GPU en la que queremos empezar
-//  lenght -> Numero de paletas que vamos a cargar (>= 1)
-// Sal: --
-// Des: Funcion que nos permite cargar en la GPU un conjunto de paletas, sustituyendo
-// unas ya existentes en concreto o añadir mas (Tener en cuenta tamaño maximo)
-void GPU_loadPalette(Palette *palettes, uint8_t ini, uint8_t length);
+void __attribute__((section(".KERNEL_CODE"))) GPU_loadMap(uint8_t *tilesMap, uint16_t height, uint16_t width);
 
 // GPU_RGB()
 // Ent: 
@@ -197,13 +208,13 @@ void GPU_loadPalette(Palette *palettes, uint8_t ini, uint8_t length);
 // Sal:
 //  Color -> Color en 16bits 
 // Des: Funcion que pasa de rgb255 a color en 16bits
-uint16_t GPU_RGB(uint8_t r, uint8_t g, uint8_t b);
+uint16_t __attribute__((section(".KERNEL_CODE"))) GPU_RGB(uint8_t r, uint8_t g, uint8_t b);
 
 // GPU_black()
 // Ent: --
 // Sal: --
 // Des: Pantallazo negro
-void GPU_black();
+void __attribute__((section(".KERNEL_CODE"))) GPU_black();
 
 // GPU_scroll()
 // Ent: 
@@ -213,7 +224,7 @@ void GPU_black();
 //  Bool -> 1 en caso de poder hacer el scroll, 0 en caso de no ser posible
 // Des: Funcion que nos permite hacer un scroll de la pantalla en cualquier direccion
 // siempre y cuando los limites del mapa nos lo permitan
-uint8_t GPU_scroll(int pX, int pY);
+uint8_t __attribute__((section(".KERNEL_CODE"))) GPU_scroll(int pX, int pY);
 
 // GPU_draw()
 // Ent: --
@@ -221,7 +232,7 @@ uint8_t GPU_scroll(int pX, int pY);
 // Des: Funcion que hace que la GPU mande el frame actual a la pantalla, hay que tener
 // en cuenta que el envio de frames afecta a las animaciones pasivas, dado que el contador
 // que utilician se guia por refrescos de pantalla (frames enviados)
-void GPU_draw();
+void __attribute__((section(".KERNEL_CODE"))) GPU_draw();
 
 // GPU_run()
 // Ent: --
@@ -230,14 +241,16 @@ void GPU_draw();
 // los refrescos de pantalla, el manejo de eventos y el control del paso de frames. De este
 // modo, si se usa esta funcion solo es necesario implementar GPU_controller, IO_interrupt y
 // IO_listener, todo lo demas se gestiona de forma opaca.
-void GPU_run(); 
+void __attribute__((section(".KERNEL_CODE"))) GPU_run(); 
 
-uint8_t GPU_addSprite(uint8_t ini, uint8_t length, uint8_t step);
-uint8_t GPU_addStatic(uint8_t ini, uint16_t length, uint8_t timer, uint8_t back, uint8_t step);
-uint8_t GPU_spriteMove(uint8_t idA, uint16_t sX, uint16_t sY);
-uint8_t GPU_staticSet(uint8_t idA, uint16_t sX, uint16_t sY);
-uint8_t GPU_spriteNext(uint8_t sprite);
-uint8_t GPU_reorderAnimation(uint8_t draw, uint8_t tile, uint8_t next);
+uint8_t __attribute__((section(".KERNEL_CODE"))) GPU_addSprite(uint8_t ini, uint8_t length, uint8_t step);
+uint8_t __attribute__((section(".KERNEL_CODE"))) GPU_addStatic(uint8_t ini, uint16_t length, uint8_t timer, uint8_t back, uint8_t step);
+uint8_t __attribute__((section(".KERNEL_CODE"))) GPU_spriteMove(uint8_t idA, uint16_t sX, uint16_t sY);
+uint8_t __attribute__((section(".KERNEL_CODE"))) GPU_staticSet(uint8_t idA, uint16_t sX, uint16_t sY);
+uint8_t __attribute__((section(".KERNEL_CODE"))) GPU_spriteNext(uint8_t sprite);
+uint8_t __attribute__((section(".KERNEL_CODE"))) GPU_reorderAnimation(uint8_t draw, uint8_t tile, uint8_t next);
+
+void __attribute__((section(".KERNEL_CODE"))) GPU_loadFont();
 
 #endif	/* GPUCORE_H */
 

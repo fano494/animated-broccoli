@@ -51,17 +51,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c GPUCore/GPUCore.c IOCore/IOCore.c HALCore/HALCore.c Tennis.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c GPUCore/GPUCore.c IOCore/IOCore.c HALCore/HALCore.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/GPUCore/GPUCore.o ${OBJECTDIR}/IOCore/IOCore.o ${OBJECTDIR}/HALCore/HALCore.o ${OBJECTDIR}/Tennis.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/GPUCore/GPUCore.o.d ${OBJECTDIR}/IOCore/IOCore.o.d ${OBJECTDIR}/HALCore/HALCore.o.d ${OBJECTDIR}/Tennis.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/GPUCore/GPUCore.o ${OBJECTDIR}/IOCore/IOCore.o ${OBJECTDIR}/HALCore/HALCore.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/GPUCore/GPUCore.o.d ${OBJECTDIR}/IOCore/IOCore.o.d ${OBJECTDIR}/HALCore/HALCore.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/GPUCore/GPUCore.o ${OBJECTDIR}/IOCore/IOCore.o ${OBJECTDIR}/HALCore/HALCore.o ${OBJECTDIR}/Tennis.o
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/GPUCore/GPUCore.o ${OBJECTDIR}/IOCore/IOCore.o ${OBJECTDIR}/HALCore/HALCore.o
 
 # Source Files
-SOURCEFILES=main.c GPUCore/GPUCore.c IOCore/IOCore.c HALCore/HALCore.c Tennis.c
+SOURCEFILES=main.c GPUCore/GPUCore.c IOCore/IOCore.c HALCore/HALCore.c
 
 
 CFLAGS=
@@ -84,7 +84,7 @@ endif
 	${MAKE}  -f nbproject/Makefile-default.mk dist/${CND_CONF}/${IMAGE_TYPE}/Nexus.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 
 MP_PROCESSOR_OPTION=32MX270F256B
-MP_LINKER_FILE_OPTION=
+MP_LINKER_FILE_OPTION=,--script="linker.ld"
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: assemble
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
@@ -104,31 +104,25 @@ ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/main.o.d 
 	@${RM} ${OBJECTDIR}/main.o 
-	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
+	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
 	
 ${OBJECTDIR}/GPUCore/GPUCore.o: GPUCore/GPUCore.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/GPUCore" 
 	@${RM} ${OBJECTDIR}/GPUCore/GPUCore.o.d 
 	@${RM} ${OBJECTDIR}/GPUCore/GPUCore.o 
-	@${FIXDEPS} "${OBJECTDIR}/GPUCore/GPUCore.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/GPUCore/GPUCore.o.d" -o ${OBJECTDIR}/GPUCore/GPUCore.o GPUCore/GPUCore.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
+	@${FIXDEPS} "${OBJECTDIR}/GPUCore/GPUCore.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/GPUCore/GPUCore.o.d" -o ${OBJECTDIR}/GPUCore/GPUCore.o GPUCore/GPUCore.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
 	
 ${OBJECTDIR}/IOCore/IOCore.o: IOCore/IOCore.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/IOCore" 
 	@${RM} ${OBJECTDIR}/IOCore/IOCore.o.d 
 	@${RM} ${OBJECTDIR}/IOCore/IOCore.o 
-	@${FIXDEPS} "${OBJECTDIR}/IOCore/IOCore.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/IOCore/IOCore.o.d" -o ${OBJECTDIR}/IOCore/IOCore.o IOCore/IOCore.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
+	@${FIXDEPS} "${OBJECTDIR}/IOCore/IOCore.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/IOCore/IOCore.o.d" -o ${OBJECTDIR}/IOCore/IOCore.o IOCore/IOCore.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
 	
 ${OBJECTDIR}/HALCore/HALCore.o: HALCore/HALCore.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/HALCore" 
 	@${RM} ${OBJECTDIR}/HALCore/HALCore.o.d 
 	@${RM} ${OBJECTDIR}/HALCore/HALCore.o 
-	@${FIXDEPS} "${OBJECTDIR}/HALCore/HALCore.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/HALCore/HALCore.o.d" -o ${OBJECTDIR}/HALCore/HALCore.o HALCore/HALCore.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
-	
-${OBJECTDIR}/Tennis.o: Tennis.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/Tennis.o.d 
-	@${RM} ${OBJECTDIR}/Tennis.o 
-	@${FIXDEPS} "${OBJECTDIR}/Tennis.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_SIMULATOR=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/Tennis.o.d" -o ${OBJECTDIR}/Tennis.o Tennis.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
+	@${FIXDEPS} "${OBJECTDIR}/HALCore/HALCore.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/HALCore/HALCore.o.d" -o ${OBJECTDIR}/HALCore/HALCore.o HALCore/HALCore.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
 	
 else
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
@@ -155,12 +149,6 @@ ${OBJECTDIR}/HALCore/HALCore.o: HALCore/HALCore.c  nbproject/Makefile-${CND_CONF
 	@${RM} ${OBJECTDIR}/HALCore/HALCore.o 
 	@${FIXDEPS} "${OBJECTDIR}/HALCore/HALCore.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/HALCore/HALCore.o.d" -o ${OBJECTDIR}/HALCore/HALCore.o HALCore/HALCore.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
 	
-${OBJECTDIR}/Tennis.o: Tennis.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/Tennis.o.d 
-	@${RM} ${OBJECTDIR}/Tennis.o 
-	@${FIXDEPS} "${OBJECTDIR}/Tennis.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -mlong-calls -D__pic__ -MMD -MF "${OBJECTDIR}/Tennis.o.d" -o ${OBJECTDIR}/Tennis.o Tennis.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD) 
-	
 endif
 
 # ------------------------------------------------------------------------------------
@@ -172,14 +160,14 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: link
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-dist/${CND_CONF}/${IMAGE_TYPE}/Nexus.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    
+dist/${CND_CONF}/${IMAGE_TYPE}/Nexus.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    linker.ld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -mdebugger -D__MPLAB_DEBUGGER_SIMULATOR=1 -mprocessor=$(MP_PROCESSOR_OPTION)  --fill=0 -o dist/${CND_CONF}/${IMAGE_TYPE}/Nexus.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)      -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_SIMULATOR=1,--defsym=_min_heap_size=2048,--defsym=_min_stack_size=1024,--no-code-in-dinit,--no-dinit-in-serial-mem,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--memorysummary,dist/${CND_CONF}/${IMAGE_TYPE}/memoryfile.xml
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -mdebugger -D__MPLAB_DEBUGGER_PK3=1 -mprocessor=$(MP_PROCESSOR_OPTION)  --fill=0 -o dist/${CND_CONF}/${IMAGE_TYPE}/Nexus.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)   -mreserve=data@0x0:0x1FC -mreserve=boot@0x1FC00490:0x1FC00BEF  -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_PK3=1,--defsym=_min_heap_size=1024,--defsym=_min_stack_size=2048,--no-code-in-dinit,--no-dinit-in-serial-mem,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem,--memorysummary,dist/${CND_CONF}/${IMAGE_TYPE}/memoryfile.xml
 	
 else
-dist/${CND_CONF}/${IMAGE_TYPE}/Nexus.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   
+dist/${CND_CONF}/${IMAGE_TYPE}/Nexus.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   linker.ld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -mprocessor=$(MP_PROCESSOR_OPTION)  --fill=0 -o dist/${CND_CONF}/${IMAGE_TYPE}/Nexus.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=_min_heap_size=2048,--defsym=_min_stack_size=1024,--no-code-in-dinit,--no-dinit-in-serial-mem,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--memorysummary,dist/${CND_CONF}/${IMAGE_TYPE}/memoryfile.xml
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -mprocessor=$(MP_PROCESSOR_OPTION)  --fill=0 -o dist/${CND_CONF}/${IMAGE_TYPE}/Nexus.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=_min_heap_size=1024,--defsym=_min_stack_size=2048,--no-code-in-dinit,--no-dinit-in-serial-mem,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem,--memorysummary,dist/${CND_CONF}/${IMAGE_TYPE}/memoryfile.xml
 	${MP_CC_DIR}\\xc32-bin2hex dist/${CND_CONF}/${IMAGE_TYPE}/Nexus.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} 
 endif
 

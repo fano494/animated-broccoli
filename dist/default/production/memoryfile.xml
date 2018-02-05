@@ -3,15 +3,15 @@
   <executable name="dist/default/production/Nexus.X.production.elf">                 
     <memory name="program">                 
       <units>bytes</units>                 
-      <length>70800</length>                 
-      <used>17472</used>                     
-      <free>53328</free>                     
+      <length>210063</length>                 
+      <used>5544</used>                     
+      <free>204519</free>                     
     </memory>                              
     <memory name="data">              
       <units>bytes</units>                 
       <length>65536</length>                 
-      <used>50476</used>                     
-      <free>15060</free>                     
+      <used>39188</used>                     
+      <free>26348</free>                     
     </memory>                              
   </executable>                            
 </project>                                 
